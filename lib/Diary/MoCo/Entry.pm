@@ -11,6 +11,17 @@ __PACKAGE__->table('entry');
 __PACKAGE__->utf8_columns(qw(title body));
 
 
+sub has_entry {
+	my ($self, $diary_id) = @_;
+	
+	if (defined $self->find(id => $diary_id)) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+
 sub update_entry {
 	my ($self, %args) = @_;
 	
