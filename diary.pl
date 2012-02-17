@@ -38,6 +38,7 @@ sub add_diary {
     
     defined $title && $title ne "" or die "Required title\nUsage: diary.pl add title [body]";
     
+	print "Input body:\n";
     my $body = join "", <STDIN>;
     chomp($body);
     defined $title && $title ne "" or die "Required body\nUsage: diary.pl add title [body]";
@@ -98,6 +99,19 @@ sub edit_diary {
 	print "Updated: ",$entry->updated_on,"\n";
 }
 
+## search
+sub search_diary {
+    my ($user, $query) = @_;
+	
+	defined $query && $query ne "" or die "Required: query\nUsage: diary.pl search query";
+	
+	my $entries = $user->search_diary(query => $query);
+	foreach my $entry (@$entries) {
+		print $entry->as_string, "\n";
+	}
+}
+
+
 ## comment
 sub comment_diary {
     my ($user, $diary_id) = @_;
@@ -136,9 +150,6 @@ sub list_comment {
 	}
 }
 
-sub search_diary {
-    my ($user) = @_;
-}
 
 
 
@@ -158,6 +169,8 @@ diary.pl - diary
   diary.pl delete diary_id
 
   diary.pl edit diary_id [body]
+
+  diary.pl search query
 
   diary.pl comment diary_id [content]
 

@@ -60,6 +60,31 @@ sub delete_diary {
 	return $diary;
 }
 
+sub search_diary {
+	my ($self, %args) = @_;
+	
+	my $page = $args{page} || 1;
+	my $limit = $args{limit} || 3;
+	my $offset = ($page - 1) * $limit;
+	
+	my @where = (
+	    { body => {-like => '%'.$args{query}.'%'}},
+		{ title => {-like => '%'.$args{query}.'%'}},
+    );
+	
+	return moco("Entry")->search(
+         #where => {
+         #    body => {-like => '%'.$args{query}.'%'},
+         #    title => {-like => '%'.$args{query}.'%'},
+         #},
+         where => ['body like :query or title like :query', query => '%'.$args{query}.'%'],
+         limit => $limit,
+         offset => $offset,
+		 order => 'created_on DESC',
+    );
+	
+}
+
 
 sub comment {
 	my ($self, $comment_id) = @_;
@@ -104,6 +129,7 @@ sub delete_comment {
 	$comment->delete;
 	return $comment;
 }
+
 
 
 1;
