@@ -12,26 +12,13 @@ use Diary::MoCo::Entry;
 __PACKAGE__->table('user');
 
 
-sub add_diary {
-    my ($self, %args) = @_;
-    
-    defined $args{body} or croak q(add_diary: parameter 'body' required);
-    
-    return moco("Entry")->create(
-        title => $args{title},
-        body => $args{body},
-        user_id => $self->id,
-    );
-}
-
-sub delete_diary {
-	my ($self, %args) = @_;
+sub diary {
+	my ($self, $diary_id) = @_;
 	
-	my $diary = moco("Entry")->find(id => $args{diary_id});
+	my $diary = moco("Entry")->find(id=>$diary_id);
 	defined $diary or croak q(Not found diary);
     $diary->user_id == $self->id or croak q(Not your diary);
 	
-	$diary->delete;
 	return $diary;
 }
 
@@ -49,6 +36,31 @@ sub diaries {
 		 order => 'created_on DESC',
     );
 }
+
+
+sub add_diary {
+    my ($self, %args) = @_;
+    
+    defined $args{body} or croak q(add_diary: parameter 'body' required);
+    
+    return moco("Entry")->create(
+        title => $args{title},
+        body => $args{body},
+        user_id => $self->id,
+    );
+}
+
+
+sub delete_diary {
+	my ($self, %args) = @_;
+	
+	my $diary = $self->diary($args{diary_id});
+	
+	
+	$diary->delete;
+	return $diary;
+}
+
 
 
 1;

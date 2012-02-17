@@ -34,7 +34,7 @@ $handler->($user, @ARGV);
 sub add_diary {
     my ($user, $title) = @_;
     
-    defined $title && $title ne "" or die "Required title\nUsage: ./diary.pl add title";
+    defined $title && $title ne "" or die "Required title\nUsage: diary.pl add title";
     
     my $body = join "", <STDIN>;
     chomp($body);
@@ -50,7 +50,7 @@ sub add_diary {
 sub delete_diary {
     my ($user, $diary_id) = @_;
 	
-	defined $diary_id && $diary_id ne "" or die "Required: diary_id\nUsage: ./diary.pl delete diary_id";
+	defined $diary_id && $diary_id ne "" or die "Required: diary_id\nUsage: diary.pl delete diary_id";
 	
 	my $diary = $user->delete_diary( diary_id => $diary_id );
 	print 'deleted: ',$diary->as_string,"\n";
@@ -66,7 +66,30 @@ sub list_diary {
 }
 
 sub edit_diary {
-    my ($user) = @_;
+    my ($user, $diary_id) = @_;
+	
+	defined $diary_id && $diary_id ne "" or die "Required: diary_id\nUsage: diary.pl edit diary_id [body]";
+	my $entry = $user->diary($diary_id);
+	
+	print "------- Before -------\n";
+	print $entry->as_string, "\n";
+	print "-------  Edit  -------\n";
+	print "Input tilte:\n";
+	my $title = <STDIN>;
+	chomp($title);
+	defined $title && $title ne "" or die "Required: title\nUsage: diary.pl edit diary_id [body]";
+
+	print "Input body:\n";
+	my $body = join "", <STDIN>;
+	chomp($body);
+	defined $body && $body ne "" or die "Required: body\nUsage: diary.pl edit diary_id [body]";
+	
+	$entry->update_entry(
+        title => $title,
+        body => $body,
+    );
+	
+	print "Updated: ",$entry->updated_on,"\n";
 }
 
 sub comment_diary {
@@ -76,3 +99,25 @@ sub comment_diary {
 sub search_diary {
     my ($user) = @_;
 }
+
+
+
+
+__END__
+
+=head1 NAME
+
+diary.pl - diary
+
+=head1 SYNOPSIS
+
+  diary.pl add title [body]
+
+  diary.pl list
+
+  diary.pl delete diary_id
+
+  diary.pl edit diary_id [body]
+
+=cut
+

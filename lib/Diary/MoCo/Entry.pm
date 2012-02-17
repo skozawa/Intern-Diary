@@ -11,6 +11,14 @@ __PACKAGE__->table('entry');
 __PACKAGE__->utf8_columns(qw(title body));
 
 
+sub update_entry {
+	my ($self, %args) = @_;
+	
+	$self->title($args{title});
+	$self->body($args{body});
+}
+
+
 sub as_string {
 	my $self = shift;
 	
