@@ -9,6 +9,7 @@ use Carp qw(croak);
 
 use Diary::MoCo::Entry;
 
+
 __PACKAGE__->table('user');
 
 
@@ -27,7 +28,7 @@ sub diaries {
     my ($self, %args) = @_;
 	
 	my $page = $args{page} || 1;
-	my $limit = $args{limit} || 3;
+	my $limit = $args{limit} || 5;
 	my $offset = ($page - 1) * $limit;
 	
 	return moco("Entry")->search(
@@ -42,13 +43,32 @@ sub diaries {
 sub add_diary {
     my ($self, %args) = @_;
     
+	my $categories = $self->add_category($args{category});
+	
     return moco("Entry")->create(
         title => $args{title},
         body => $args{body},
+        category_ids => join(",",@$categories),
         user_id => $self->id,
     );
 }
 
+
+sub add_category {
+	my ($self, $category) = @_;
+	
+	my $categories = [];
+	foreach my $c (split(/,/,$category)) {
+		if (moco("Category")->has_row(name => $c)) {
+			push @$categories, moco("Category")->find(name => $c)->id;
+		} else {
+			my $category = moco("Category")->create(name => $c);
+			push @$categories, $category->id;
+		}
+	}
+	
+	return $categories;
+}
 
 sub delete_diary {
 	my ($self, %args) = @_;
@@ -64,7 +84,7 @@ sub search_diary {
 	my ($self, %args) = @_;
 	
 	my $page = $args{page} || 1;
-	my $limit = $args{limit} || 3;
+	my $limit = $args{limit} || 5;
 	my $offset = ($page - 1) * $limit;
 	
 	my @where = (
