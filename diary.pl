@@ -6,6 +6,7 @@ use lib "lib", glob "modules/*/lib";
 use Diary::MoCo;
 use Pod::Usage;
 use Encode::Locale;
+use Getopt::Long;
 
 binmode STDOUT, ':encoding(console_out)';
 
@@ -21,6 +22,12 @@ my %HANDLERS = (
     del_comment => \&delete_comment,
     comments => \&list_comment,
 );
+
+my $opts = {
+    'page' => 1,
+    'limit' => 5,
+};
+GetOptions($opts, 'page=i', 'limit=i');
 
 my $command = shift @ARGV || '';
 
@@ -68,7 +75,7 @@ sub delete_diary {
 sub list_diary {
     my ($user) = @_;
     
-    my $entries = $user->diaries;
+    my $entries = $user->diaries(%$opts);
 	foreach my $entry (@$entries) {
 		print $entry->as_string, "\n";
 	}
@@ -110,7 +117,7 @@ sub search_diary {
 	
 	defined $query && $query ne "" or die "Required: query\nUsage: diary.pl search query";
 	
-	my $entries = $user->search_diary(query => $query);
+	my $entries = $user->search_diary(query => $query, %$opts);
 	foreach my $entry (@$entries) {
 		print $entry->as_string, "\n";
 	}
@@ -132,7 +139,8 @@ sub list_diary_of_category {
 	defined $category_id && $category_id ne "" or die "Required: category_id\nUsage: diary.pl list_cid category_id";
 	
 	my $diaries = moco("Entry")->get_entry_by_category(
-        cid => $category_id
+        cid => $category_id,
+        %$opts,
     );
 	foreach my $diary (@$diaries) {
 		print $diary->as_string, "\n";
@@ -153,6 +161,7 @@ sub comment_diary {
 	my $comment = $user->add_comment(
         diary_id => $diary_id,
         content => $content,
+        %$opts,
     );
 }
 
@@ -170,7 +179,7 @@ sub delete_comment {
 sub list_comment {
 	my ($user) = @_;
     
-	my $comments = $user->comments;
+	my $comments = $user->comments(%$opts);
 	foreach my $comment (@$comments) {
 		print $comment->as_string, "\n";
 	}
@@ -181,14 +190,12 @@ sub list_comment {
 sub input_line {
 	my $input = <STDIN>;
 	chomp($input);
-	#$input = Encode::encode("utf-8", $input);
 	return $input;
 }
 
 sub input_lines {
 	my $input = join "", <STDIN>;
 	chomp($input);
-	#$input = Encode::encode("utf-8", $input);
 	return $input;
 }
 

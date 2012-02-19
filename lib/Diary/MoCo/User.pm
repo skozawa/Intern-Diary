@@ -27,8 +27,8 @@ sub diary {
 sub diaries {
     my ($self, %args) = @_;
 	
-	my $page = $args{page} || 1;
-	my $limit = $args{limit} || 5;
+	my $page = $args{page};
+	my $limit = $args{limit};
 	my $offset = ($page - 1) * $limit;
 	
 	return moco("Entry")->search(
@@ -83,8 +83,8 @@ sub delete_diary {
 sub search_diary {
 	my ($self, %args) = @_;
 	
-	my $page = $args{page} || 1;
-	my $limit = $args{limit} || 5;
+	my $page = $args{page};
+	my $limit = $args{limit};
 	my $offset = ($page - 1) * $limit;
 	
 	my @where = (
@@ -119,8 +119,8 @@ sub comment {
 sub comments {
 	my ($self, %args) = @_;
 	
-	my $page = $args{page} || 1;
-	my $limit = $args{limit} || 3;
+	my $page = $args{page};
+	my $limit = $args{limit};
 	my $offset = ($page - 1) * $limit;
 	
 	return moco("Comment")->search(

@@ -42,8 +42,8 @@ sub add_category {
 sub get_entry_by_category {
 	my ($self, %args) = @_;
 	
-	my $page = $args{page} || 1;
-	my $limit = $args{limit} || 5;
+	my $page = $args{page};
+	my $limit = $args{limit};
 	my $offset = ($page - 1) * $limit;
 	
 	return $self->search(
