@@ -1,0 +1,40 @@
+CREATE TABLE user (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	name VARBINARY(32) NOT NULL,
+	created_on DATETIME NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE KEY (name)
+);
+
+
+CREATE TABLE category (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	name VARBINARY(255) NOT NULL,
+	created_on DATETIME NOT NULL,
+	PRIMARY KEY (id),
+	UNIQUE KEY (name)
+);
+
+CREATE TABLE entry (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	user_id INT UNSIGNED NOT NULL,
+	title VARBINARY(255) NOT NULL,
+	body BLOB NOT NULL,
+	category_id INT UNSIGNED,
+	created_on DATETIME NOT NULL,
+	updated_on DATETIME NOT NULL,
+	PRIMARY KEY (id),
+	KEY (user_id, category_id)
+);
+
+
+CREATE TABLE comment (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	user_id INT UNSIGNED NOT NULL,
+	diary_id INT UNSIGNED NOT NULL,
+	content BLOB NOT NULL,
+	created_on DATETIME NOT NULL,
+	PRIMARY KEY (id),
+	KEY (user_id, diary_id, created_on)
+);
+

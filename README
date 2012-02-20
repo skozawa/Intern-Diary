@@ -1,0 +1,23 @@
+ファイル構成
+- diary.pl
+- lib
+  - Diary
+    - DataBase.pm
+    - MoCo.pm
+    - MoCo
+      - Category.pm
+      - Comment.pm
+      - Entry.pm
+      - User.pm
+- t
+  - Diary.pm
+  - Diary-MoCo.t
+  - Diary-MoCo-Entry.t
+  - Diary-MoCo-Category.t
+  - Diary-MoCo-User.t
+- modules
+  - DBIx-MoCo
+- db
+  - schema.sql
+- mysqldump
+  - intern_diary_skozawa.sql
