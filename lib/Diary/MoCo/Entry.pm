@@ -5,6 +5,7 @@ use warnings;
 
 use base 'Diary::MoCo';
 use Diary::MoCo;
+use Carp qw(croak);
 
 __PACKAGE__->table('entry');
 
@@ -15,13 +16,16 @@ __PACKAGE__->utf8_columns(qw(title body));
 sub get_entry_by_category {
 	my ($self, %args) = @_;
 	
-	my $page = $args{page};
-	my $limit = $args{limit};
+	defined $args{cid} && $args{cid} ne "" or croak "Required: category_id";
+	
+	my $page = $args{page} || 1;
+	my $limit = $args{limit} || 5;
 	my $offset = ($page - 1) * $limit;
 	
 	return $self->search(
          where => {
-             category_ids => [ {-like => $args{cid}.',%'},
+             category_ids => [ {-like => $args{cid}},
+                               {-like => $args{cid}.',%'},
 						       {-like => '%,'.$args{cid}},
 							   {-like => '%,'.$args{cid}.',%'}],
          },
