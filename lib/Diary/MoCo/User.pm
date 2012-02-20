@@ -7,8 +7,6 @@ use base 'Diary::MoCo';
 use Diary::MoCo;
 use Carp qw(croak);
 
-use Diary::MoCo::Entry;
-
 
 __PACKAGE__->table('user');
 
@@ -27,8 +25,8 @@ sub diary {
 sub diaries {
     my ($self, %args) = @_;
 	
-	my $page = $args{page};
-	my $limit = $args{limit};
+	my $page = $args{page} || 1;
+	my $limit = $args{limit} || 5;
 	my $offset = ($page - 1) * $limit;
 	
 	return moco("Entry")->search(
@@ -43,6 +41,10 @@ sub diaries {
 sub add_diary {
     my ($self, %args) = @_;
     
+	defined $args{category} or croak "Required: category";
+	defined $args{title} && $args{title} ne "" or croak "Required: title";
+	defined $args{body} && $args{body} ne "" or croak "Required: body";
+
 	my $categories = $self->add_category($args{category});
 	
     return moco("Entry")->create(
@@ -73,6 +75,8 @@ sub add_category {
 sub delete_diary {
 	my ($self, %args) = @_;
 	
+	defined $args{diary_id} && $args{diary_id} ne '' or croak "Reequired: diary_id";
+	
 	my $diary = $self->diary($args{diary_id});
 	
 	
@@ -80,11 +84,32 @@ sub delete_diary {
 	return $diary;
 }
 
+sub edit_diary {
+	my ($self, %args) = @_;
+	
+	defined $args{diary_id} && $args{diary_id} ne "" or croak "Required: diary_id";
+	defined $args{category} or croak "Required: category";
+	defined $args{title} && $args{title} ne "" or croak "Required: title";
+	defined $args{body} && $args{body} ne "" or croak "Required: body";
+	
+	my $entry = $self->diary($args{diary_id});
+	
+	$entry->title($args{title});
+	$entry->body($args{body});
+	
+	my $categories = $self->add_category($args{category});
+	$entry->category_ids(join(",",@$categories));
+	
+	return $entry;
+}
+
 sub search_diary {
 	my ($self, %args) = @_;
 	
-	my $page = $args{page};
-	my $limit = $args{limit};
+	defined $args{query} && $args{query} ne "" or croak "Required: query";
+	
+	my $page = $args{page} || 1;
+	my $limit = $args{limit} || 5;
 	my $offset = ($page - 1) * $limit;
 	
 	my @where = (
@@ -119,8 +144,8 @@ sub comment {
 sub comments {
 	my ($self, %args) = @_;
 	
-	my $page = $args{page};
-	my $limit = $args{limit};
+	my $page = $args{page} || 1;
+	my $limit = $args{limit} || 5;
 	my $offset = ($page - 1) * $limit;
 	
 	return moco("Comment")->search(
@@ -134,6 +159,10 @@ sub comments {
 sub add_comment {
 	my ($self, %args) = @_;
 	
+	defined $args{diary_id} && $args{diary_id} ne "" or croak "Required: diary_id";
+	moco("Entry")->has_row(id => $args{diary_id}) or croak "Not found diary\n";
+	defined $args{content} && $args{content} ne "" or croak "Required: diary_id";
+	
 	return moco("Comment")->create(
         user_id => $self->id,
         diary_id => $args{diary_id},
@@ -143,6 +172,8 @@ sub add_comment {
 
 sub delete_comment {
 	my ($self, %args) = @_;
+	
+	defined $args{comment_id} && $args{comment_id} ne "" or croak "Required: comment_id";
 	
 	my $comment = $self->comment($args{comment_id});
 	

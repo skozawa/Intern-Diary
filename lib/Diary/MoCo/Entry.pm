@@ -12,33 +12,6 @@ __PACKAGE__->utf8_columns(qw(title body));
 
 
 
-sub update_entry {
-	my ($self, %args) = @_;
-	
-	$self->title($args{title});
-	$self->body($args{body});
-	
-	return if(!defined $args{category} || $args{category} eq "");
-	my $categories = $self->add_category($args{category});
-	$self->category_ids(join(",",@$categories));
-}
-
-sub add_category {
-	my ($self, $category) = @_;
-	
-	my $categories = [];
-	foreach my $c (split(/,/,$category)) {
-		if (moco("Category")->has_row(name => $c)) {
-			push @$categories, moco("Category")->find(name => $c)->id;
-		} else {
-			my $category = moco("Category")->create(name => $c);
-			push @$categories, $category->id;
-		}
-	}
-	
-	return $categories;
-}
-
 sub get_entry_by_category {
 	my ($self, %args) = @_;
 	

@@ -102,6 +102,12 @@ sub edit_diary {
 	my $body = &input_lines;
 	defined $body && $body ne "" or die "Required: body\nUsage: diary.pl edit diary_id [body]";
 	
+	my $entry = $user->edit_diary(
+        diary_id => $diary_id,
+        title => $title,
+        category => $category,
+        body => $body,
+    );
 	$entry->update_entry(
         title => $title,
         category => $category,
