@@ -14,32 +14,32 @@ __PACKAGE__->utf8_columns(qw(title body));
 
 
 sub get_entry_by_category {
-	my ($self, %args) = @_;
-	
-	defined $args{cid} && $args{cid} ne "" or croak "Required: category_id";
-	
-	my $page = $args{page} || 1;
-	my $limit = $args{limit} || 5;
-	my $offset = ($page - 1) * $limit;
-	
-	return $self->search(
-         where => {
-             category_ids => [ {-like => $args{cid}},
-                               {-like => $args{cid}.',%'},
-						       {-like => '%,'.$args{cid}},
-							   {-like => '%,'.$args{cid}.',%'}],
-         },
-         limit => $limit,
-         offset => $offset,
-		 order => 'created_on DESC',
+    my ($self, %args) = @_;
+    
+    defined $args{cid} && $args{cid} ne "" or croak "Required: category_id";
+    
+    my $page = $args{page} || 1;
+    my $limit = $args{limit} || 5;
+    my $offset = ($page - 1) * $limit;
+    
+    return $self->search(
+        where => {
+            category_ids => [ {-like => $args{cid}},
+                              {-like => $args{cid}.',%'},
+                              {-like => '%,'.$args{cid}},
+                              {-like => '%,'.$args{cid}.',%'}],
+        },
+        limit => $limit,
+        offset => $offset,
+        order => 'created_on DESC',
     );
 }
 
 
 sub as_string {
-	my $self = shift;
-	
-	return sprintf "%d: %s\t%s\t%s(%s)\n%s", (
+    my $self = shift;
+    
+    return sprintf "%d: %s\t%s\t%s(%s)\n%s", (
         $self->id,
         $self->title,
         $self->category_ids,

@@ -24,10 +24,10 @@ sub t01_add_entry : Tests {
     
     ## 正常動作用
     my @diaries = (
-                   { title => "test1", body => "これはテストです", category => "" },
-                   { title => "test2", body => "今日は晴れです", category => "天気,日記" },
-                   { title => "test3", body => "今日は雪が降りました", category => "天気,冬" },
-                   { title => "test4", body => "MoCoの勉強中です", category => "MoCo"},
+        { title => "test1", body => "これはテストです", category => "" },
+        { title => "test2", body => "今日は晴れです", category => "天気,日記" },
+        { title => "test3", body => "今日は雪が降りました", category => "天気,冬" },
+        { title => "test4", body => "MoCoの勉強中です", category => "MoCo"},
     );
     
     ## Diary1の追加
@@ -50,17 +50,17 @@ sub t01_add_entry : Tests {
     ## Diary4の追加
     my $diary4 = $user->add_diary(%{$diaries[3]});
     is $diary4->body, $diaries[3]->{body}, '$diary4 body';
-
+    
     ## 異常動作用
     my @diaries2 = (
-                    {title => "error_test"},
-                    {body => "これはテストです"},
-                    {category => "category1"},
-                    {title => "error_test4", body => ""},
-                    {body => "This is a test", category => "テスト"},
-                    {title => "error_test", category => "エラー"},
-                    {title => "", body => "", category => ""},
-                    {},
+        {title => "error_test"},
+        {body => "これはテストです"},
+        {category => "category1"},
+        {title => "error_test4", body => ""},
+        {body => "This is a test", category => "テスト"},
+        {title => "error_test", category => "エラー"},
+        {title => "", body => "", category => ""},
+        {},
     );
     dies_ok {$user->add_diaries(%$_);} 'dies_ok diary error' for @diaries2;
     
@@ -134,17 +134,17 @@ sub t03_edit_diary : Tests {
     
     ## 異常動作
     my @e_diaries = (
-                     {},
-                     { title => "test", diary_id => 2 },
-                     { body => "今日は雨でした", diary_id => 2 },
-                     { category => "", diary_id => 2 },
-                     { title => "test", body => "test", category => "テスト"},
-                     { title => "test", body => "test", diary_id => 2},
-                     { title => "test", category => "test", diary_id => 2},
-                     { body => "test", category => "test", diary_id => 2},
-                     { title => "", body => "", category => "", diary_id => 2},
-                     { title => undef, body => undef, category => undef, diary_id => 2},
-                     { title => "test", body => "test", category => "test", diary_id => 3},
+        {},
+        { title => "test", diary_id => 2 },
+        { body => "今日は雨でした", diary_id => 2 },
+        { category => "", diary_id => 2 },
+        { title => "test", body => "test", category => "テスト"},
+        { title => "test", body => "test", diary_id => 2},
+        { title => "test", category => "test", diary_id => 2},
+        { body => "test", category => "test", diary_id => 2},
+        { title => "", body => "", category => "", diary_id => 2},
+        { title => undef, body => undef, category => undef, diary_id => 2},
+        { title => "test", body => "test", category => "test", diary_id => 3},
     );
     dies_ok { $user->edit_diary(%$_); } 'dies_ok edit diary error_args' for @e_diaries;
     
@@ -251,11 +251,11 @@ sub t12_delete_comment {
     my $user = Diary::MoCo::User->find(name => 'test_user_1');
     
     my @comments = (
-        "コメントテスト", # -> 2
-        "明日は晴れますよ", # -> 2
-        "MoCoは便利ですよ", # -> 4
-        "モコモコ", # -> 4
-        "明日は曇らしいですよ", # -> 2
+        "コメントテスト", #1
+        "明日は晴れますよ", #2
+        "MoCoは便利ですよ", #3
+        "モコモコ", #4
+        "明日は曇らしいですよ", #5
     );
     
     ## 初期状態
@@ -281,6 +281,29 @@ sub t12_delete_comment {
     is_deeply $user->comments->map( sub { $_->id } )->to_a, [2,3,5], '$user->comments->id';
     is_deeply $user->comments->map( sub { $_->content })->to_a, [@comments[1,2,4]], '$user->comments->content';
     is_deeply $user->comments->map( sub { $_->diary_id })->to_a, [2,2,4], '$user->comments->diary_id';
+}
+
+
+sub t21_add_category : Test {
+    ## テストユーザの取得
+    my $user = Diary::MoCo::User->find(name => 'test_user_1');
+    
+    my @categories = ( "天気", "日記", "冬", "MoCo", "雨");
+    
+    ## 初期状態
+    my $categories = Diary::MoCo::Category->categories;
+    is_deeply $categories->map( sub { $_->name } )->to_a, [@categories], 'initial category';
+    
+    ## カテゴリの追加
+    my $categories1 = $user->add_category("Perl,PHP");
+    is_deeply $categories1, [6,7], 'add category';
+    
+    my $categories2 = $user->add_category("Hatena,Perl,MoCo");
+    is_deeply $categories2, [4,6,8], 'add category';
+
+    ## 追加後
+    my $categories = Diary::MoCo::Category->categories;
+    is_deeply $categories->map( sub { $_->name } )->to_a, [@categories,"Perl","PHP","Hatena"], 'initial category';
 }
 
 

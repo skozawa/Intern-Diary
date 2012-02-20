@@ -13,9 +13,9 @@ __PACKAGE__->utf8_columns('content');
 
 
 sub as_string {
-	my $self = shift;
-	
-	return sprintf "%d: %d\t%s\n%s", (
+    my $self = shift;
+    
+    return sprintf "%d: %d\t%s\n%s", (
         $self->id,
         $self->diary_id,
         $self->created_on->ymd,

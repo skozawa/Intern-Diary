@@ -19,10 +19,10 @@ sub startup : Test(startup){
 sub get_entry_by_category : Tests {
     ## テスト用日記生成
     my @diaries = (
-                   { title => "test1", body => "これはテストです", category_ids => "", user_id => 1},
-                   { title => "test2", body => "今日は晴れです", category_ids => "1,2", user_id => 1 },
-                   { title => "test3", body => "今日は雪が降りました", category_ids => "1,3", user_id => 1 },
-                   { title => "test4", body => "MoCoの勉強中です", category_ids => "4", user_id => 1},
+        { title => "test1", body => "これはテストです", category_ids => "", user_id => 1},
+        { title => "test2", body => "今日は晴れです", category_ids => "1,2", user_id => 1 },
+        { title => "test3", body => "今日は雪が降りました", category_ids => "1,3", user_id => 1 },
+        { title => "test4", body => "MoCoの勉強中です", category_ids => "4", user_id => 1},
     );
     ok my $diary = Diary::MoCo::Entry->create(%$_), 'create entry' for @diaries;
     ## テスト用カテゴリ生成

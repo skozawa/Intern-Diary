@@ -7,7 +7,7 @@ use t::Diary;
 
 
 sub startup : Test {
-	use_ok 'Diary::MoCo';
+    use_ok 'Diary::MoCo';
 }
 
 __PACKAGE__->runtests;

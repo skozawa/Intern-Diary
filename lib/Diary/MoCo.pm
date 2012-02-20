@@ -79,13 +79,13 @@ sub now {
 
 
 sub has_row {
-	my ($self, %args) = @_;
-	
-	if (defined $self->find(%args)) {
-		return 1;
-	} else {
-		return 0;
-	}
+    my ($self, %args) = @_;
+    
+    if (defined $self->find(%args)) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 
