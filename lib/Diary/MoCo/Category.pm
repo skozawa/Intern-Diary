@@ -10,7 +10,7 @@ __PACKAGE__->table('category');
 
 __PACKAGE__->utf8_columns(qw(name));
 
-
+## カテゴリ一覧の取得
 sub categories {
     my ($self, %args) = @_;
     

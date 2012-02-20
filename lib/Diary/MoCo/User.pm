@@ -10,18 +10,20 @@ use Carp qw(croak);
 
 __PACKAGE__->table('user');
 
-
+## diary_idの日記の取得
 sub diary {
     my ($self, $diary_id) = @_;
     
     my $diary = moco("Entry")->find(id=>$diary_id);
+    ## 日記が存在するか確認
     defined $diary or croak q(Not found diary);
+    ## ユーザ自身の日記か
     $diary->user_id == $self->id or croak q(Not your diary);
     
     return $diary;
 }
 
-
+## 日記一覧の取得
 sub diaries {
     my ($self, %args) = @_;
     
@@ -37,14 +39,16 @@ sub diaries {
     );
 }
 
-
+## 日記の追加
 sub add_diary {
     my ($self, %args) = @_;
     
+    ## 入力確認
     defined $args{category} or croak "Required: category";
     defined $args{title} && $args{title} ne "" or croak "Required: title";
     defined $args{body} && $args{body} ne "" or croak "Required: body";
     
+    ## カテゴリ処理
     my $categories = $self->add_category($args{category});
     
     return moco("Entry")->create(
@@ -55,24 +59,28 @@ sub add_diary {
     );
 }
 
-
+## カテゴリ追加
 sub add_category {
     my ($self, $category) = @_;
     
     my $categories = [];
     foreach my $c (split(/,/,$category)) {
+        ## 既に存在するカテゴリかどうか
         if (moco("Category")->has_row(name => $c)) {
             push @$categories, moco("Category")->find(name => $c)->id;
         } else {
+            ## カテゴリ追加
             my $category = moco("Category")->create(name => $c);
             push @$categories, $category->id;
         }
     }
-    $categories = [sort @$categories];
+    ## idの昇順にソート
+    $categories = [sort {$a <=> $b} @$categories];
     
     return $categories;
 }
 
+## 日記の削除
 sub delete_diary {
     my ($self, %args) = @_;
     
@@ -85,6 +93,7 @@ sub delete_diary {
     return $diary;
 }
 
+## 日記の編集
 sub edit_diary {
     my ($self, %args) = @_;
     
@@ -104,6 +113,7 @@ sub edit_diary {
     return $entry;
 }
 
+## 日記の検索
 sub search_diary {
     my ($self, %args) = @_;
     
@@ -113,11 +123,11 @@ sub search_diary {
     my $limit = $args{limit} || 5;
     my $offset = ($page - 1) * $limit;
     
+    ## タイトルか本文にキーワードを含む日記を検索
     my @where = (
         { body => {-like => '%'.$args{query}.'%'}},
         { title => {-like => '%'.$args{query}.'%'}},
     );
-    
     return moco("Entry")->search(
          #where => {
          #    body => {-like => '%'.$args{query}.'%'},
@@ -131,17 +141,19 @@ sub search_diary {
     
 }
 
-
+## comment_idのコメントを取得
 sub comment {
     my ($self, $comment_id) = @_;
     
     my $comment = moco("Comment")->find(id=>$comment_id);
     defined $comment or croak q(Not found comment);
+    ## ユーザ自身のコメントかどうか
     $comment->user_id == $self->id or croak q(Not your comment);
     
     return $comment;
 }
 
+## コメント一覧の取得
 sub comments {
     my ($self, %args) = @_;
     
@@ -157,6 +169,7 @@ sub comments {
     );
 }
 
+## コメントの追加
 sub add_comment {
     my ($self, %args) = @_;
     
@@ -171,6 +184,7 @@ sub add_comment {
     );
 }
 
+## コメントの削除
 sub delete_comment {
     my ($self, %args) = @_;
     

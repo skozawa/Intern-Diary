@@ -12,7 +12,7 @@ __PACKAGE__->table('entry');
 __PACKAGE__->utf8_columns(qw(title body));
 
 
-
+## カテゴリIDを用いた日記の取得
 sub get_entry_by_category {
     my ($self, %args) = @_;
     
