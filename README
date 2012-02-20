@@ -1,4 +1,18 @@
-ファイル構成
+・機能
+- add title [category] [body] : 日記の追加
+- list : 日記一覧
+- delete diary_id : 日記の削除
+- edit diary_id [title] [category] [body] : 日記の編集
+- show diary_id : 日記とコメントの表示
+- search query : 日記の検索
+- categoreis : カテゴリ一覧
+- list_cid category_id : カテゴリに属する日記の一覧
+- comment diary_id [content] : コメント追加
+- del_comment comment_id : コメント削除
+- comments : コメント一覧
+
+
+・ファイル構成
 - diary.pl
 - lib
   - Diary

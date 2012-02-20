@@ -15,6 +15,7 @@ my %HANDLERS = (
     delete => \&delete_diary,
     list => \&list_diary,
     edit => \&edit_diary,
+    show => \&show_diary,
     search => \&search_diary,
     categories => \&list_category,
     list_cid => \&list_diary_of_category,
@@ -109,6 +110,21 @@ sub edit_diary {
         body => $body,
     );
     print "Updated: ",$new_entry->updated_on,"\n";
+}
+
+## show
+sub show_diary {
+    my ($user, $diary_id) = @_;
+    defined $diary_id && $diary_id ne "" or die "Required: diary_id\nUsage: diary.pl edit diary_id [body]";
+    my $entry = $user->diary($diary_id);
+    
+    print "---- Entry ----\n";
+    print $entry->as_string, "\n";
+    print "---- Comment ----\n";
+    my $comments = $entry->comments(%$opts);
+    foreach my $comment (@$comments) {
+        print $comment->as_string, "\n";
+    }
 }
 
 ## search
@@ -212,6 +228,7 @@ diary.pl - diary
   diary.pl list
   diary.pl delete diary_id
   diary.pl edit diary_id [title] [category] [body]
+  diary.pl show diary_id
   diary.pl search query
   diary.pl categories
   diary.pl list_cid category_id

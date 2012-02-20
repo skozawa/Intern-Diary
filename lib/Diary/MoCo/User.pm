@@ -17,8 +17,6 @@ sub diary {
     my $diary = moco("Entry")->find(id=>$diary_id);
     ## 日記が存在するか確認
     defined $diary or croak q(Not found diary);
-    ## ユーザ自身の日記か
-    $diary->user_id == $self->id or croak q(Not your diary);
     
     return $diary;
 }
@@ -87,7 +85,9 @@ sub delete_diary {
     defined $args{diary_id} && $args{diary_id} ne '' or croak "Reequired: diary_id";
     
     my $diary = $self->diary($args{diary_id});
-    
+    ## ユーザ自身の日記か
+    $diary->user_id == $self->id or croak q(Not your diary);
+
     
     $diary->delete;
     return $diary;
@@ -103,6 +103,8 @@ sub edit_diary {
     defined $args{body} && $args{body} ne "" or croak "Required: body";
     
     my $entry = $self->diary($args{diary_id});
+    ## ユーザ自身の日記か
+    $entry->user_id == $self->id or croak q(Not your diary);
     
     $entry->title($args{title});
     $entry->body($args{body});
@@ -147,8 +149,6 @@ sub comment {
     
     my $comment = moco("Comment")->find(id=>$comment_id);
     defined $comment or croak q(Not found comment);
-    ## ユーザ自身のコメントかどうか
-    $comment->user_id == $self->id or croak q(Not your comment);
     
     return $comment;
 }
@@ -191,6 +191,8 @@ sub delete_comment {
     defined $args{comment_id} && $args{comment_id} ne "" or croak "Required: comment_id";
     
     my $comment = $self->comment($args{comment_id});
+    ## ユーザ自身のコメントかどうか
+    $comment->user_id == $self->id or croak q(Not your comment);
     
     $comment->delete;
     return $comment;
