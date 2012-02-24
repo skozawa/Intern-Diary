@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head>
+  <title>[% title %]</title>
+  <meta charset="utf-8"/>
+  <kmeta name="viewpoint" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <style type="text/css">
+   [% INSERT style.css %]
+  </style>
+ </head>
+ <body>
+  <header id="global-header">
+    [% INCLUDE header.html %]
+    [% INCLUDE search.html %]
+  </header>
+  
+  <div id="content">
+   [% content %]
+  </div>
+
+  <footer id="global-footer">
+    [% INCLUDE footer.html %]
+  </footer>
+ </body>
+</html>
+  

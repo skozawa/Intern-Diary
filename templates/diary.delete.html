@@ -1,0 +1,16 @@
+[% WRAPPER "_wrapper.tt", title = "Intern::Diary::Delete" %]
+
+<form action="" method="post">
+ <p>本当に削除しますか？</p>
+ <p>タイトル：[% entry.title%] </p>
+ <p>カテゴリ：
+  [% FOR category IN categoreis %]
+   [% category.name %]
+  [% END %]
+ <p>
+ <p>本文：[% entry.body %] </p>
+ <input type="submit" value="削除">
+
+</form>
+
+[% END %]

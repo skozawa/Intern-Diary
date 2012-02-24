@@ -1,0 +1,13 @@
+[% WRAPPER "_wrapper.tt", title = "Intern::Diary::Category" %]
+
+<div>
+ <p>カテゴリ：[% category.name %]</p>
+ <div>
+  エントリ：
+ [% FOR entry IN entries %]
+  <p> [% entry.title %] </p>
+ [% END %]
+ </div>
+</div>
+
+[% END %]

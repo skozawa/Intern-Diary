@@ -1,0 +1,11 @@
+package Diary::Engine::Diary;
+use strict;
+use warnings;
+use Diary::Engine -Base;
+
+sub default : Public {
+    my ($self, $r) = @_;
+    $r->res->content('Diary');
+}
+
+1;

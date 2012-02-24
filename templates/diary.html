@@ -1,0 +1,32 @@
+[% WRAPPER "_wrapper.tt", title = "Intern::Diary" %]
+
+<haeder>
+ タイトル：[% entry.title | html %]
+ [
+ [% FOR category IN categories %]
+  [% category.name %]
+ [% END %]
+ ]
+</header>
+<div>
+ 本文：
+ [% entry.body %]
+</div>
+
+コメント：
+<comments>
+ [% FOR comment IN comments %]
+  [% comment.content %]
+  [% IF r.user.id == comment.user_id %]
+    Yours
+  [% END %]
+ [% END %]
+</comments>
+
+<form action="/comment.add" method="post">
+ <input type="text" id="content"/>
+ <input type="submit" value="投稿"/>
+ <input type="hidden" name="entry_id" value="[% entry.id | html %]"/>
+</form>
+
+[% END %]

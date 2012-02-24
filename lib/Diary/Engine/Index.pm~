@@ -1,0 +1,19 @@
+package Diary::Engine::Index;
+use strict;
+use warnings;
+use Diary::Engine -Base;
+
+use Diary::MoCo;
+
+sub default : Public {
+    my ($self, $r) = @_;
+    
+    my $user = moco("User")->find(name => 'kozawa');
+    
+    my $entries = $user->diaries;
+    $r->stash->param( entries => $entries );
+    
+    
+}
+
+1;

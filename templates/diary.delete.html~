@@ -1,0 +1,8 @@
+[% WRAPPER "_wrapper.tt", title = "Intern::Diary::Delete" %]
+
+<form action="" method="post">
+ <p>本当に削除しますか？</p>
+ 
+</form>
+
+[% END %]

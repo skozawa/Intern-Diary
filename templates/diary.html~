@@ -1,0 +1,21 @@
+[% WRAPPER "_wrapper.tt", title = "Intern::Diary" %]
+
+<haeder>
+ [% entry.title | html %]
+ [
+ [% FOR category IN categories %]
+  [% category.name %]
+ [% END %]
+ ]
+</header>
+<div>
+ [% entry.body %]
+</div>
+
+<comments>
+ [% FOR comment IN comments %]
+  [% comment.content %]
+ [% END %]
+</comments>
+
+[% END %]

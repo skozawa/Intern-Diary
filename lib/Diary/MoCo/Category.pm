@@ -4,6 +4,8 @@ use strict;
 use warnings;
 
 use base 'Diary::MoCo';
+use Diary::MoCo;
+use Carp qw(croak);
 
 __PACKAGE__->table('category');
 
@@ -22,6 +24,34 @@ sub categories {
          offset => $offset,
          order => 'id ASC',
     );
+}
+
+## entry_idでカテゴリを検索
+sub get_category_by_entry {
+    my ($self, %args) = @_;
+    
+    defined $args{entry_id} && $args{entry_id} ne "" or croak "Required: entry_id";
+    
+    my @category_ids = map { $_->category_id }
+        moco('Rel_entry_category')->search( where => { entry_id => $args{entry_id} } );
+
+    return if(!@category_ids);
+    
+    return $self->search( where => { id => { -in => [@category_ids] } } );
+}
+
+## entryでカテゴリを検索
+sub get_category_by_entries {
+    my ($self, $entries) = @_;
+    
+    my @entry_ids = map { $_->id } @$entries;
+    return if(!@entry_ids);
+    
+    my @category_ids = map { $_->category_id}
+        moco('Rel_entry_category')->search( where => { entry_id => { -in => [@entry_ids] } } );
+    return if(!@category_ids);
+    
+    return $self->search( where => { id => { -in => [@category_ids] } } );
 }
 
 
