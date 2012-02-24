@@ -22,18 +22,22 @@ sub get_entry_by_category {
     my $limit = $args{limit} || 5;
     my $offset = ($page - 1) * $limit;
     
+    my @entry_ids;
+    for (moco("Rel_entry_category")->search( where => { category_id => $args{cid} })) {
+        push @entry_ids, $_->entry_id;
+    }
+    return if(!@entry_ids);
+    
     return $self->search(
         where => {
-            category_ids => [ {-like => $args{cid}},
-                              {-like => $args{cid}.',%'},
-                              {-like => '%,'.$args{cid}},
-                              {-like => '%,'.$args{cid}.',%'}],
+            id => { -in => [@entry_ids] },
         },
         limit => $limit,
         offset => $offset,
         order => 'created_on DESC',
     );
 }
+
 
 sub comments {
     my ($self, %args) = @_;
@@ -43,7 +47,7 @@ sub comments {
     my $offset = ($page - 1) * $limit;
     
     return moco("Comment")->search(
-        where => { diary_id => $self->id },
+        where => { entry_id => $self->id },
         limit => $limit,
         offset => $offset,
         order => 'created_on DESC',
@@ -53,10 +57,9 @@ sub comments {
 sub as_string {
     my $self = shift;
     
-    return sprintf "%d: %s\t%s\t%s(%s)\n%s", (
+    return sprintf "%d: %s\t%s(%s)\n%s", (
         $self->id,
         $self->title,
-        $self->category_ids,
         $self->created_on->ymd,
         $self->updated_on->ymd,
         $self->body,

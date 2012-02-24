@@ -23,6 +23,7 @@
       - Comment.pm
       - Entry.pm
       - User.pm
+      - Rel_entry_category.pm
 - t
   - Diary.pm
   - Diary-MoCo.t

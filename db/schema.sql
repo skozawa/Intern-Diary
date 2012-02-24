@@ -20,21 +20,25 @@ CREATE TABLE entry (
 	user_id INT UNSIGNED NOT NULL,
 	title VARBINARY(255) NOT NULL,
 	body BLOB NOT NULL,
-	category_ids BLOB,
 	created_on DATETIME NOT NULL,
 	updated_on DATETIME NOT NULL,
 	PRIMARY KEY (id),
 	KEY (user_id)
 );
 
+CREATE TABLE rel_entry_category (
+	entry_id INT UNSIGNED NOT NULL,
+	category_id INT UNSIGNED NOT NULL,
+	PRIMARY KEY (entry_id, category_id)
+);
 
 CREATE TABLE comment (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	user_id INT UNSIGNED NOT NULL,
-	diary_id INT UNSIGNED NOT NULL,
+	entry_id INT UNSIGNED NOT NULL,
 	content BLOB NOT NULL,
 	created_on DATETIME NOT NULL,
 	PRIMARY KEY (id),
-	KEY (user_id, diary_id, created_on)
+	KEY (user_id, entry_id, created_on)
 );
 

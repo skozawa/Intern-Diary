@@ -11,15 +11,15 @@ use Getopt::Long;
 binmode STDOUT, ':encoding(console_out)';
 
 my %HANDLERS = (
-    add => \&add_diary,
-    delete => \&delete_diary,
-    list => \&list_diary,
-    edit => \&edit_diary,
-    show => \&show_diary,
-    search => \&search_diary,
+    add => \&add_entry,
+    delete => \&delete_entry,
+    list => \&list_entry,
+    edit => \&edit_entry,
+    show => \&show_entry,
+    search => \&search_entry,
     categories => \&list_category,
-    list_cid => \&list_diary_of_category,
-    comment => \&comment_diary,
+    list_cid => \&list_entry_of_category,
+    comment => \&comment_entry,
     del_comment => \&delete_comment,
     comments => \&list_comment,
 );
@@ -41,70 +41,74 @@ $handler->($user, @ARGV);
 
 
 ## add
-sub add_diary {
+sub add_entry {
     my ($user, $title) = @_;
     
     defined $title && $title ne "" or die "Required title\nUsage: diary.pl add title [body]";
     
     print "Input category (separete ','):\n";
-    my $category = &input_line;
+    my $category = input_line();
     
     print "Input body:\n";
-    my $body = &input_lines;
+    my $body = input_lines();
     defined $title && $title ne "" or die "Required body\nUsage: diary.pl add title [body]";
     
-    my $diary = $user->add_diary(
+    my $entry = $user->add_entry(
         title => $title,
-        category => $category,
         body => $body,
     );
     
-    print "add diary: ",$diary->id,"\n";;
+    $user->add_category(
+        category => $category,
+        entry_id => $entry->id,
+    );
+    
+    print "add entry: ",$entry->id,"\n";;
 }
 
 ## delete
-sub delete_diary {
-    my ($user, $diary_id) = @_;
+sub delete_entry {
+    my ($user, $entry_id) = @_;
     
-    defined $diary_id && $diary_id ne "" or die "Required: diary_id\nUsage: diary.pl delete diary_id";
+    defined $entry_id && $entry_id ne "" or die "Required: entry_id\nUsage: diary.pl delete entry_id";
     
-    my $diary = $user->delete_diary( diary_id => $diary_id );
-    print 'deleted: ',$diary->as_string,"\n";
+    my $entry = $user->delete_entry( entry_id => $entry_id );
+    print 'deleted: ',$entry->as_string,"\n";
 }
 
 ## list
-sub list_diary {
+sub list_entry {
     my ($user) = @_;
     
-    my $entries = $user->diaries(%$opts);
+    my $entries = $user->entries(%$opts);
     foreach my $entry (@$entries) {
         print $entry->as_string, "\n";
     }
 }
 
 ## edit
-sub edit_diary {
-    my ($user, $diary_id) = @_;
+sub edit_entry {
+    my ($user, $entry_id) = @_;
     
-    defined $diary_id && $diary_id ne "" or die "Required: diary_id\nUsage: diary.pl edit diary_id [body]";
-    my $entry = $user->diary($diary_id);
+    defined $entry_id && $entry_id ne "" or die "Required: entry_id\nUsage: diary.pl edit entry_id [body]";
+    my $entry = moco('Entry')->find(id => $entry_id, user_id => $user->id);
     
     print "------- Before -------\n";
     print $entry->as_string, "\n";
     print "-------  Edit  -------\n";
     print "Input tilte:\n";
-    my $title = &input_line;
-    defined $title && $title ne "" or die "Required: title\nUsage: diary.pl edit diary_id [body]";
+    my $title = input_line();
+    defined $title && $title ne "" or die "Required: title\nUsage: diary.pl edit entry_id [body]";
     
     print "Input category (separete ','):\n";
-    my $category = &input_line;
+    my $category = input_line();
     
     print "Input body:\n";
-    my $body = &input_lines;
-    defined $body && $body ne "" or die "Required: body\nUsage: diary.pl edit diary_id [body]";
+    my $body = input_lines();
+    defined $body && $body ne "" or die "Required: body\nUsage: diary.pl edit entry_id [body]";
     
-    my $new_entry = $user->edit_diary(
-        diary_id => $diary_id,
+    my $new_entry = $user->edit_entry(
+        entry_id => $entry_id,
         title => $title,
         category => $category,
         body => $body,
@@ -113,10 +117,10 @@ sub edit_diary {
 }
 
 ## show
-sub show_diary {
-    my ($user, $diary_id) = @_;
-    defined $diary_id && $diary_id ne "" or die "Required: diary_id\nUsage: diary.pl edit diary_id [body]";
-    my $entry = $user->diary($diary_id);
+sub show_entry {
+    my ($user, $entry_id) = @_;
+    defined $entry_id && $entry_id ne "" or die "Required: entry_id\nUsage: diary.pl edit entry_id [body]";
+    my $entry = $user->entry($entry_id);
     
     print "---- Entry ----\n";
     print $entry->as_string, "\n";
@@ -128,12 +132,12 @@ sub show_diary {
 }
 
 ## search
-sub search_diary {
+sub search_entry {
     my ($user, $query) = @_;
     
     defined $query && $query ne "" or die "Required: query\nUsage: diary.pl search query";
     
-    my $entries = $user->search_diary(query => $query, %$opts);
+    my $entries = $user->search_entry(query => $query, %$opts);
     foreach my $entry (@$entries) {
         print $entry->as_string, "\n";
     }
@@ -149,33 +153,33 @@ sub list_category {
 }
 
 ## list_cid
-sub list_diary_of_category {
+sub list_entry_of_category {
     my ($user, $category_id) = @_;
     
     defined $category_id && $category_id ne "" or die "Required: category_id\nUsage: diary.pl list_cid category_id";
     
-    my $diaries = moco("Entry")->get_entry_by_category(
+    my $entries = moco("Entry")->get_entry_by_category(
         cid => $category_id,
         %$opts,
     );
-    foreach my $diary (@$diaries) {
-        print $diary->as_string, "\n";
+    foreach my $entry (@$entries) {
+        print $entry->as_string, "\n";
     }
 }
 
 ## comment
-sub comment_diary {
-    my ($user, $diary_id) = @_;
+sub comment_entry {
+    my ($user, $entry_id) = @_;
     
-    defined $diary_id && $diary_id ne "" or die "Required: diary_id\nUsage: diary.pl comment diary_id [content]";
-    moco("Entry")->has_row(id => $diary_id) or die "Not found diary\n";
+    defined $entry_id && $entry_id ne "" or die "Required: entry_id\nUsage: diary.pl comment entry_id [content]";
+    moco("Entry")->has_row(id => $entry_id) or die "Not found entry\n";
     
     print "Input body:\n";
-    my $content = &input_lines;
-    defined $content && $content ne "" or die "Required: content\nUsage: diary.pl comment diary_id [content]";
+    my $content = input_lines();
+    defined $content && $content ne "" or die "Required: content\nUsage: diary.pl comment entry_id [content]";
     
     my $comment = $user->add_comment(
-        diary_id => $diary_id,
+        entry_id => $entry_id,
         content => $content,
         %$opts,
     );
@@ -226,13 +230,13 @@ diary.pl - diary
 
   diary.pl add title [category] [body]
   diary.pl list
-  diary.pl delete diary_id
-  diary.pl edit diary_id [title] [category] [body]
-  diary.pl show diary_id
+  diary.pl delete entry_id
+  diary.pl edit entry_id [title] [category] [body]
+  diary.pl show entry_id
   diary.pl search query
   diary.pl categories
   diary.pl list_cid category_id
-  diary.pl comment diary_id [content]
+  diary.pl comment entry_id [content]
   diary.pl del_comment comment_id
   diary.pl comments
 

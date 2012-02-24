@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use base 'Diary::MoCo';
-use Diary::MoCo;
 
 __PACKAGE__->table('category');
 

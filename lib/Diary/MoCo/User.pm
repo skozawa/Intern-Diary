@@ -10,19 +10,8 @@ use Carp qw(croak);
 
 __PACKAGE__->table('user');
 
-## diary_idの日記の取得
-sub diary {
-    my ($self, $diary_id) = @_;
-    
-    my $diary = moco("Entry")->find(id=>$diary_id);
-    ## 日記が存在するか確認
-    defined $diary or croak q(Not found diary);
-    
-    return $diary;
-}
-
 ## 日記一覧の取得
-sub diaries {
+sub entries {
     my ($self, %args) = @_;
     
     my $page = $args{page} || 1;
@@ -38,85 +27,95 @@ sub diaries {
 }
 
 ## 日記の追加
-sub add_diary {
+sub add_entry {
     my ($self, %args) = @_;
     
     ## 入力確認
-    defined $args{category} or croak "Required: category";
     defined $args{title} && $args{title} ne "" or croak "Required: title";
     defined $args{body} && $args{body} ne "" or croak "Required: body";
-    
-    ## カテゴリ処理
-    my $categories = $self->add_category($args{category});
     
     return moco("Entry")->create(
         title => $args{title},
         body => $args{body},
-        category_ids => join(",",@$categories),
         user_id => $self->id,
     );
 }
 
 ## カテゴリ追加
 sub add_category {
-    my ($self, $category) = @_;
+    my ($self, %args) = @_;
     
-    my $categories = [];
-    foreach my $c (split(/,/,$category)) {
+    defined $args{entry_id} && $args{entry_id} ne "" or croak "Required: entry_id";
+    return if (!defined $args{category} || $args{category} eq "");
+
+    foreach my $c (split(/,/,$args{category})) {
+        my $category;
         ## 既に存在するカテゴリかどうか
-        if (moco("Category")->has_row(name => $c)) {
-            push @$categories, moco("Category")->find(name => $c)->id;
+        if ($category = moco("Category")->find(name => $c)) {
         } else {
             ## カテゴリ追加
-            my $category = moco("Category")->create(name => $c);
-            push @$categories, $category->id;
+            $category = moco("Category")->create(name => $c);
         }
+        moco("Rel_entry_category")->create(
+            entry_id => $args{entry_id},
+            category_id => $category->id,
+        );
     }
-    ## idの昇順にソート
-    $categories = [sort {$a <=> $b} @$categories];
-    
-    return $categories;
 }
 
 ## 日記の削除
-sub delete_diary {
+sub delete_entry {
     my ($self, %args) = @_;
     
-    defined $args{diary_id} && $args{diary_id} ne '' or croak "Reequired: diary_id";
+    defined $args{entry_id} && $args{entry_id} ne '' or croak "Reequired: entry_id";
     
-    my $diary = $self->diary($args{diary_id});
+    my $entry = moco('Entry')->find(id => $args{entry_id}, user_id => $self->id);
     ## ユーザ自身の日記か
-    $diary->user_id == $self->id or croak q(Not your diary);
-
+    $entry->user_id == $self->id or croak q(Not your entry);
     
-    $diary->delete;
-    return $diary;
+    $entry->delete;
+    
+    ## カテゴリの削除
+    foreach my $relation ( moco("Rel_entry_category")->search( where => { entry_id => $entry->id } )) {
+        $relation->delete;
+    }
+    ## コメントの削除
+    foreach my $comment ( moco("Comment")->search( where => { entry_id => $entry->id } )) {
+        $comment->delete;
+    }
+    
+    return $entry;
 }
 
 ## 日記の編集
-sub edit_diary {
+sub edit_entry {
     my ($self, %args) = @_;
     
-    defined $args{diary_id} && $args{diary_id} ne "" or croak "Required: diary_id";
+    defined $args{entry_id} && $args{entry_id} ne "" or croak "Required: entry_id";
     defined $args{category} or croak "Required: category";
     defined $args{title} && $args{title} ne "" or croak "Required: title";
     defined $args{body} && $args{body} ne "" or croak "Required: body";
     
-    my $entry = $self->diary($args{diary_id});
+    my $entry = moco('Entry')->find(id => $args{entry_id}, user_id => $self->id);
     ## ユーザ自身の日記か
-    $entry->user_id == $self->id or croak q(Not your diary);
+    $entry->user_id == $self->id or croak q(Not your entry);
     
     $entry->title($args{title});
     $entry->body($args{body});
     
-    my $categories = $self->add_category($args{category});
-    $entry->category_ids(join(",",@$categories));
+    return if( $args{category} eq "" );
+    
+    ## カテゴリとエントリの関係を削除
+    foreach my $relation ( moco("Rel_entry_category")->search( where => { entry_id => $entry->id } )) {
+        $relation->delete;
+    }
+    $self->add_category( entry_id => $entry->id, category => $args{category} );
     
     return $entry;
 }
 
 ## 日記の検索
-sub search_diary {
+sub search_entry {
     my ($self, %args) = @_;
     
     defined $args{query} && $args{query} ne "" or croak "Required: query";
@@ -173,13 +172,13 @@ sub comments {
 sub add_comment {
     my ($self, %args) = @_;
     
-    defined $args{diary_id} && $args{diary_id} ne "" or croak "Required: diary_id";
-    moco("Entry")->has_row(id => $args{diary_id}) or croak "Not found diary\n";
-    defined $args{content} && $args{content} ne "" or croak "Required: diary_id";
+    defined $args{entry_id} && $args{entry_id} ne "" or croak "Required: entry_id";
+    moco("Entry")->has_row(id => $args{entry_id}) or croak "Not found entry\n";
+    defined $args{content} && $args{content} ne "" or croak "Required: entry_id";
     
     return moco("Comment")->create(
         user_id => $self->id,
-        diary_id => $args{diary_id},
+        entry_id => $args{entry_id},
         content => $args{content},
     );
 }
