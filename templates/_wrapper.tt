@@ -15,7 +15,10 @@
    
    <div id="content">
     [% IF r.user %]
-     [% r.user.name %]
+     <p>
+      <a href="/index.mypage">[% r.user.name %]</a>
+      [<a href="/index.logout">ログアウト</a>]
+     </p>
     [% END %]
     [% content %]
    </div>

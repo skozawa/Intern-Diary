@@ -1,5 +1,8 @@
 [% WRAPPER "_wrapper.tt", title = "Intern::Diary" %]
 
+<div id="category_url">
+ <a href="/category.all">カテゴリ一覧</a>
+</div>
 [% IF entries.size %]
  <div id="entry_list">
   [% FOR entry IN entries %]
@@ -19,7 +22,10 @@
   [% END %]
  </div>
 [% ELSE %]
-  <p>No entry</p> 
+ <div>
+  <p>まだ日記がありません</p>
+  <p><a href="/diary.add">日記を書く</a></p>
+ </div>
 [% END %]
 
 [% END %]

@@ -2,7 +2,8 @@
 
 <div id="entry">
  <header>
-  [% entry.title | html %]
+  <span class="user">id:[% entry_user.name %]の日記</span>
+  <span class="title">[% entry.title | html %]</span>
   <span class="category">
   [
   [% FOR category IN categories %]
@@ -21,20 +22,24 @@
  <div id="comments">
  コメント
  [% FOR comment IN comments %]
-  <div class="comment">
+  <section class="comment">
    <header>
-    [% comment.user_id | html %]
+    [% comment_users.item("$comment.user_id").name | html %]
+	<span class="time">([% comment.created_on | html %])</span>
    </header>
    <p>
     [% comment.content | html %]
-     [% IF r.user.id == comment.user_id %]
-      Yours
-     [% END %]
    </p>
    <footer>
-    [% comment.created_on | html %]
+    [% IF r.user.id == comment.user_id %]
+	 <form action="/comment.delete" method="POST">
+	  <input type="hidden" name="entry_id" value="[% entry.id %]">
+	  <input type="hidden" name="cid" value="[% comment.id %]">
+      <input type="submit" value="削除">
+	 </form>
+    [% END %]
    </footer>
-  </div>
+  </section>
  [% END %]
 
  <form action="/comment.add" method="post">

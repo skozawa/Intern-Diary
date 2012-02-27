@@ -38,7 +38,7 @@ sub get_entry_by_category {
     );
 }
 
-
+## エントリに対するコメントを取得
 sub comments {
     my ($self, %args) = @_;
     

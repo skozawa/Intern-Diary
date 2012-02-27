@@ -1,6 +1,12 @@
 [% WRAPPER "_wrapper.tt", title = "Intern::Diary::Search" %]
 
 <div id="search_results">
+[% IF query %]
+検索語：[% query %]
+[% ELSE  %]
+検索語がありません。
+[% END %]
+
 [% IF entries.size %]
  <div>
   [% FOR entry IN entries %]

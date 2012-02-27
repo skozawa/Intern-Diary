@@ -9,6 +9,7 @@ use UNIVERSAL::require;
 use Path::Class;
 use Plack::Builder;
 use Cache::MemoryCache;
+use LWP::Simple qw($ua);
 
 my $namespace = 'Diary';
 $namespace->use or die $@;
@@ -28,6 +29,20 @@ builder {
 
     enable "Plack::Middleware::ReverseProxy";
 
+	enable 'Plack::Middleware::Session::Cookie';
+	
+	enable 'Plack::Middleware::HatenaOAuth',
+	    consumer_key       => 'vUarxVrr0NHiTg==',
+	    consumer_secret    => 'RqbbFaPN2ubYqL/+0F5gKUe7dHc=',
+	    login_path         => '/login_hatena',
+        ua                 => $ua;
+	
+	enable 'Plack::Middleware::TwitterOAuth',
+	    consumer_key       => 'F3khxwmfD6xW9C8JAGA',
+        consumer_secret    => 'I2ma3elmHLLdkMGMx0JPKslHTowLh5R3xJfzenIKmg',
+        login_path         => '/login_twitter',
+        ua                 => $ua;
+	
     sub {
         my $env = shift;
         $namespace->process($env, {
