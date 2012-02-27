@@ -1,13 +1,21 @@
 [% WRAPPER "_wrapper.tt", title = "Intern::Diary::Category" %]
 
-<div>
- <p>カテゴリ：[% category.name %]</p>
+<div id="category">
+ <header>
+  [% category.name | html %]
+ </header>
  <div>
-  エントリ：
+ エントリ：
  [% FOR entry IN entries %]
-  <p> [% entry.title %] </p>
+  <p class="entry"> 
+   <a href="diary?id=[% entry.id %]">[% entry.title | html %]</a>
+   ([% entry.created_on | html %])
+  </p>
  [% END %]
  </div>
+ <footer>
+  [% category.created_on | html %]
+ </footer>
 </div>
 
 [% END %]

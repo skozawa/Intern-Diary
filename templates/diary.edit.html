@@ -1,10 +1,23 @@
 [% WRAPPER "_wrapper.tt", title = "Intern::Diary::Edit "%]
 
-<form action="" method="post">
- <p>タイトル：<input type="text" id="title" value="[% entry ? entry.title : r.req.param('title') | html %]"></p>
- <p>カテゴリ：<input type="text" id="category" value="[% category | html %]"><p>
- <p>本文：<input type="text" id="body" value="[% entry ? entry.body : r.req.param('body') | html %]"></p>
- <input type="submit" value="編集">
-</form>
+<div id="entry">
+ <form action="" method="post">
+  <p>
+   タイトル
+   <input type="text" name="title" id="title" value="[% entry ? entry.title : r.req.param('title') | html %]">
+  </p>
+  <p>
+   カテゴリ
+   <input type="text" name="category" id="category" value="[% category | html %]">
+  </p>
+  <p>
+   本文
+   <textarea name="body" id="body">[% entry ? entry.body : r.req.param('body') | html %]</textarea>
+  </p>
+  <p class="submit_button">
+   <input type="submit" value="編集">
+  </p>
+ </form>
+</div>
 
 [% END %]

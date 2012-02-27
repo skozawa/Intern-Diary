@@ -1,22 +1,28 @@
 [% WRAPPER "_wrapper.tt", title = "Intern::Diary::Search" %]
 
+<div id="search_results">
 [% IF entries.size %]
- <div id="entry">
+ <div>
   [% FOR entry IN entries %]
    <section class="entry">
-    <p>[% entry.title %]
-	[
-    [% FOR category IN categories.item("$entry.id") %]
-      [% category.name %]
-    [% END %]
-	]
-	</p>
-	<p>[% entry.body %]</p>
+    <header>
+     <a href="/diary?id=[% entry.id %]">[% entry.title | html %]</a>
+	 <span class="entry_attr">
+	 [
+     [% FOR category IN categories.item("$entry.id") %]
+      <a href="/category?id=[% category.id %]">[% category.name | html %]</a>
+     [% END %]
+	 ]
+	 ([% entry.created_on | html %])
+	 </span>
+	</header>
+	<p class="body">[% entry.body | html %]</p>
    </section>
   [% END %]
  </div>
 [% ELSE %]
  <p>No Entry</p>
 [% END %]
+</div>
 
 [% END %]
