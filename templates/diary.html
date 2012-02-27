@@ -1,32 +1,47 @@
 [% WRAPPER "_wrapper.tt", title = "Intern::Diary" %]
 
-<haeder>
- タイトル：[% entry.title | html %]
- [
- [% FOR category IN categories %]
-  [% category.name %]
- [% END %]
- ]
-</header>
-<div>
- 本文：
- [% entry.body %]
-</div>
-
-コメント：
-<comments>
- [% FOR comment IN comments %]
-  [% comment.content %]
-  [% IF r.user.id == comment.user_id %]
-    Yours
+<div id="entry">
+ <header>
+  [% entry.title | html %]
+  <span class="category">
+  [
+  [% FOR category IN categories %]
+   <a href="/category?id=[% category.id%]">[% category.name | html %]</a>
   [% END %]
- [% END %]
-</comments>
+  ]
+  </span>
+ </header>
+ <div class="entry_body">
+  [% entry.body | html %]
+ </div>
+ <footer>
+  [% entry.created_on | html %] ([% entry.updated_on | html %])
+ </footer>
 
-<form action="/comment.add" method="post">
- <input type="text" id="content"/>
- <input type="submit" value="投稿"/>
- <input type="hidden" name="entry_id" value="[% entry.id | html %]"/>
-</form>
+ <div id="comments">
+ コメント
+ [% FOR comment IN comments %]
+  <div class="comment">
+   <header>
+    [% comment.user_id | html %]
+   </header>
+   <p>
+    [% comment.content | html %]
+     [% IF r.user.id == comment.user_id %]
+      Yours
+     [% END %]
+   </p>
+   <footer>
+    [% comment.created_on | html %]
+   </footer>
+  </div>
+ [% END %]
+
+ <form action="/comment.add" method="post">
+  <textarea name="content" id="content"></textarea>
+  <input type="submit" value="投稿"/>
+  <input type="hidden" name="entry_id" value="[% entry.id %]"/>
+ </form>
+</div>
 
 [% END %]
