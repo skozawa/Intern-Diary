@@ -27,8 +27,15 @@ sub all : Public {
     my ($self, $r) = @_;
     
     my $categories = moco('Category')->categories;
+    my $entries;
+    for my $category (@$categories) {
+        $entries->{$category->id} = moco('Entry')->get_entry_by_category( cid => $category->id );
+    }
     
-    $r->stash->param( categories => $categories );
+    $r->stash->param(
+        categories => $categories,
+        entries => $entries,
+    );
 }
 
 
