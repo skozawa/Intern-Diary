@@ -148,20 +148,11 @@ sub search_entry {
     );
 }
 
+## 検索結果の総数を取得
 sub search_result_size {
     my ($self, $query) = @_;
     
     return moco('Entry')->count(['body like :query or title like :query', query => '%'.$query.'%']);
-}
-
-## comment_idのコメントを取得
-sub comment {
-    my ($self, $comment_id) = @_;
-    
-    my $comment = moco("Comment")->find(id=>$comment_id);
-    defined $comment or croak q(Not found comment);
-    
-    return $comment;
 }
 
 ## コメント一覧の取得
@@ -201,7 +192,9 @@ sub delete_comment {
     
     defined $args{comment_id} && $args{comment_id} ne "" or croak "Required: comment_id";
     
-    my $comment = $self->comment($args{comment_id});
+    my $comment = moco("Comment")->find(id=>$args{comment_id});
+    defined $comment or croak q(Not found comment);
+
     ## ユーザ自身のコメントかどうか
     $comment->user_id == $self->id or croak q(Not your comment);
     

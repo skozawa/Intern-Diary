@@ -7,7 +7,7 @@ use Diary::DataBase;
 Diary::DataBase->dsn('dbi:mysql:dbname=intern_diary_test');
 
 sub truncate_db {
-    Diary::DataBase->execute("TRUNCATE TABLE $_") for qw(user entry comment category);
+    Diary::DataBase->execute("TRUNCATE TABLE $_") for qw(user entry comment category rel_entry_category);
 }
 
 
