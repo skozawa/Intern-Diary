@@ -12,8 +12,20 @@ sub user {
     if (my $name = ($self->req->env->{'hatena.user'} || $self->req->env->{'twitter.user'})) {
         my $user = moco('User')->find(name => $name) || moco('User')->create(name => $name);
     } else {
-
+        
     }
 }
+
+__PACKAGE__->add_trigger(
+    before_dispatch => sub {
+        my ($self) = @_;
+        return if ($self->req->uri->path eq '/index.login');
+        
+        if (not my $name = ($self->req->env->{'hatena.user'} || $self->req->env->{'twitter.user'})) {
+            $self->res->redirect('/index.login');
+            return;
+        }
+    }
+);
 
 1;

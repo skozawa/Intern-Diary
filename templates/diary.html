@@ -2,12 +2,12 @@
 
 <div id="entry">
  <header>
-  <span class="user">id:[% entry_user.name %]の日記</span>
+  <span class="user">id:[% entry_user.name | html %]の日記</span>
   <span class="title">[% entry.title | html %]</span>
   <span class="category">
   [
   [% FOR category IN categories %]
-   <a href="/category?id=[% category.id%]">[% category.name | html %]</a>
+   <a href="/category?id=[% category.id | uri %]">[% category.name | html %]</a>
   [% END %]
   ]
   </span>

@@ -6,6 +6,9 @@ use Diary::Engine -Base;
 use Diary::MoCo;
 use Carp qw(croak);
 
+use XML::FeedPP;
+use utf8;
+
 ## カテゴリの表示
 sub default : Public {
     my ($self, $r) = @_;
@@ -37,7 +40,7 @@ sub all : Public {
     for my $category ( @$categories ) {
         my $entries_tmp = moco('Entry')->get_entry_by_category(cid => $category->id);
         $entries->{ $category->id } = $entries_tmp;
-        map { push @$user_ids, $_->id } @$entries_tmp;
+        map { push @$user_ids, $_->user_id } @$entries_tmp;
     }
     my $entry_users = $self->users($user_ids);
     
@@ -48,6 +51,80 @@ sub all : Public {
     );
 }
 
+## RSSフィード
+sub feed_rss : Public {
+    my ($self, $r) = @_;
+    
+    $r->req->form(
+        id => ['NOT_BLANK', 'UINT'],
+    );
+    
+    if (not $r->req->form->has_error) {
+        my $id = $r->req->param('id');
+        
+        my $category = moco('Category')->find(id => $id);
+        my $entries = moco('Entry')->get_entry_by_category( cid => $id );
+        
+        my $feed = XML::FeedPP::RSS->new();
+        
+        $feed->title($category->name);
+        $feed->link($r->config->app_config('default')->{uri});
+        $feed->description("カテゴリ「".$category->name."」の日記");
+        
+        foreach my $entry ( @$entries ) {
+            $feed->add_item (
+                link => $r->config->app_config('default')->{uri}.'diary?id='.$entry->id,
+                title => $entry->title,
+                description => (split(/\n/,$entry->body))[0],
+                pubData => $entry->created_on->strftime('%Y-%m-%dT%H:%M:%S%z'),
+            );
+        }
+        
+        $r->res->content_type('application/xml');
+        $r->res->content($feed->to_string('UTF-8'));
+    } else {
+        $r->res->redirect('/category.all');
+        return;
+    }
+}
+
+## Atomフィード
+sub feed_atom : Public {
+    my ($self, $r) = @_;
+    
+    $r->req->form(
+        id => ['NOT_BLANK', 'UINT'],
+    );
+    
+    if (not $r->req->form->has_error) {
+        my $id = $r->req->param('id');
+        
+        my $category = moco('Category')->find(id => $id);
+        my $entries = moco('Entry')->get_entry_by_category( cid => $id );
+        
+        my $feed = XML::FeedPP::Atom::Atom10->new();
+        
+        $feed->title($category->name);
+        $feed->link($r->config->app_config('default')->{uri});
+        $feed->description("カテゴリ「".$category->name."」の日記");
+        
+        foreach my $entry ( @$entries ) {
+            $feed->add_item (
+                link => $r->config->app_config('default')->{uri}.'diary?id='.$entry->id,
+                title => $entry->title,
+                content => $entry->body,
+                pubData => $entry->created_on->strftime('%Y-%m-%dT%H:%M:%S%z'),
+                updated => $entry->updated_on->strftime('%Y-%m-%dT%H:%M:%S%z'),
+            );
+        }
+        
+        $r->res->content_type('application/xml');
+        $r->res->content($feed->to_string('UTF-8'));
+    } else {
+        $r->res->redirect('/category.all');
+        return;
+    }
+}
 
 ## エントリを書いたユーザを取得
 sub entry_users {

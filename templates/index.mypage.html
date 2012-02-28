@@ -12,16 +12,16 @@
     <tr>
      <section class="entry_item">
 	  <td class="entry_title">
-	   <a href="/diary?id=[% entry.id | html %]">[% entry.title | html %]</a>
+	   <a href="/diary?id=[% entry.id | uri %]">[% entry.title | html %]</a>
 	  </td>
 	  <td>
 	   ([% entry.created_on | html %])
 	  </td>
 	  <td>
-       <button type="button" onClick="location.href='/diary.edit?id=[% entry.id %]'">編集</button>
+       <button type="button" onClick="location.href='/diary.edit?id=[% entry.id | uri %]'">編集</button>
 	  </td>
 	  <td>
-	   <button type="button" onClick="location.href='/diary.delete?id=[% entry.id %]'">削除</button>
+	   <button type="button" onClick="location.href='/diary.delete?id=[% entry.id | uri %]'">削除</button>
 	  </td>
     </section>
     </tr>

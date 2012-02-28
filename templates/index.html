@@ -7,10 +7,10 @@
  <div id="entry_list">
   [% FOR entry IN entries %]
    <section class="entry_item">
-    <header><a href="/diary?id=[% entry.id | html %]">[% entry.title | html %]</a>
+    <header><a href="/diary?id=[% entry.id | uri %]">[% entry.title | html %]</a>
 	[
     [% FOR category IN categories.item("$entry.id") %]
-      <a href="category?id=[% category.id | html %]">[% category.name | html %]</a>
+      <a href="category?id=[% category.id | uri %]">[% category.name | html %]</a>
     [% END %]
 	]
 	</header>

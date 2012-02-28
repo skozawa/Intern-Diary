@@ -4,13 +4,17 @@
  [% FOR category IN categories %]
  <div class="category">
   <header>
-   [<a href="category?id=[% category.id %]">[% category.name | html %]</a>]
+   [<a href="category?id=[% category.id | uri %]">[% category.name | html %]</a>]
+   <span class="feed">
+    <button type="button">RSS</button>
+    <button type="button">Atom</button>
+   </span>
   </header>
   <div class="entries">
    [% FOR entry IN entries.item("$category.id") %]
     <p>
-     <a href="diary?id=[% entry.id %]">[% entry.title | html %]</a>,
-     id:[% entry_users.item("$entry.user_id").name %]
+     <a href="diary?id=[% entry.id | uri %]">[% entry.title | html %]</a>,
+     id:[% entry_users.item("$entry.user_id").name | html %]
 	</p>
    [% END %]
   </div>

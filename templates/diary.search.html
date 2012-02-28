@@ -12,11 +12,11 @@
   [% FOR entry IN entries %]
    <section class="entry">
     <header>
-     <a href="/diary?id=[% entry.id %]">[% entry.title | html %]</a>
+     <a href="/diary?id=[% entry.id | uri %]">[% entry.title | html %]</a>
 	 <span class="entry_attr">
 	 [
      [% FOR category IN categories.item("$entry.id") %]
-      <a href="/category?id=[% category.id %]">[% category.name | html %]</a>
+      <a href="/category?id=[% category.id | uri %]">[% category.name | html %]</a>
      [% END %]
 	 ]
 	 ([% entry.created_on | html %])

@@ -8,7 +8,7 @@
  エントリ：
  [% FOR entry IN entries %]
   <p class="entry">
-   <a href="diary?id=[% entry.id %]">[% entry.title | html %]</a>,
+   <a href="diary?id=[% entry.id | uri %]">[% entry.title | html %]</a>,
    id:[% entry_users.item("$entry.user_id").name %]
    ([% entry.created_on | html %])
   </p>
