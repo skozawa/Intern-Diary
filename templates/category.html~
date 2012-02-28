@@ -1,5 +1,0 @@
-[% WRAPEER "_wrapper.tt", title = "Intern::Diary::Category" %]
-
-
-
-[% END %]

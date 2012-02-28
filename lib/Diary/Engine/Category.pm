@@ -13,42 +13,64 @@ use utf8;
 sub default : Public {
     my ($self, $r) = @_;
     
-    my $id = $r->req->param('id');
-    if ( !defined $id || $id eq "" ) {
-        $r->res->redirect('/category.all');
-        return;
-    }
-    
-    my $category = moco('Category')->find(id => $id);
-    my $entries = moco('Entry')->get_entry_by_category( cid => $id );
-    my $entry_users = $self->entry_users($entries);
-    
-    $r->stash->param( 
-        category => $category,
-        entries => $entries,
-        entry_users => $entry_users,
+    $r->req->form(
+        id => ['NOT_BLANK','UINT'],
     );
+    
+    if (not $r->req->form->has_error) {
+        my $id = $r->req->param('id');
+        my $category = moco('Category')->find(id => $id);
+        if ( !$category ) {
+            $r->res->redirect('/category.all');
+            return;
+        }
+        my $entries = moco('Entry')->get_entry_by_category( cid => $id );
+        my $entry_users = $self->entry_users($entries);
+        
+        $r->stash->param( 
+            category => $category,
+            entries => $entries,
+            entry_users => $entry_users,
+        );
+    } else {
+        $r->res->redirect('/category.all');
+    }
 }
 
 ## カテゴリの一覧
 sub all : Public {
     my ($self, $r) = @_;
     
-    my $categories = moco('Category')->categories;
-    my $entries;
-    my $user_ids;
-    for my $category ( @$categories ) {
-        my $entries_tmp = moco('Entry')->get_entry_by_category(cid => $category->id);
-        $entries->{ $category->id } = $entries_tmp;
-        map { push @$user_ids, $_->user_id } @$entries_tmp;
-    }
-    my $entry_users = $self->users($user_ids);
-    
-    $r->stash->param(
-        categories => $categories,
-        entries => $entries,
-        entry_users => $entry_users,
+    $r->req->form(
+        page => ['UINT'],
     );
+    
+    if (not $r->req->form->has_error) {
+        my $page = $r->req->param('page') || 1;
+        my $limit = 5;
+        
+        my $categories = moco('Category')->categories(page => $page);
+        my $entries;
+        my $user_ids;
+        for my $category ( @$categories ) {
+            my $entries_tmp = moco('Entry')->get_entry_by_category(cid => $category->id);
+            $entries->{ $category->id } = $entries_tmp;
+            map { push @$user_ids, $_->user_id } @$entries_tmp;
+        }
+        my $entry_users = $self->users($user_ids);
+        my $category_size = moco('Category')->count;
+        my $has_next = $page * $limit < $category_size ? 1 : 0;
+        
+        $r->stash->param(
+            categories => $categories,
+            entries => $entries,
+            entry_users => $entry_users,
+            page => $page,
+            has_next => $has_next,
+        );
+    } else {
+        $r->res->redirect('/category.all');
+    }
 }
 
 ## RSSフィード
@@ -84,7 +106,6 @@ sub feed_rss : Public {
         $r->res->content($feed->to_string('UTF-8'));
     } else {
         $r->res->redirect('/category.all');
-        return;
     }
 }
 
@@ -122,7 +143,6 @@ sub feed_atom : Public {
         $r->res->content($feed->to_string('UTF-8'));
     } else {
         $r->res->redirect('/category.all');
-        return;
     }
 }
 

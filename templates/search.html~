@@ -1,6 +1,0 @@
-<div id="search"
- <form action="search" method="post">
-  <input type="text" id="query" name="query"/>
-  <input type="submit" value="検索"/>
- </form>
-</div>

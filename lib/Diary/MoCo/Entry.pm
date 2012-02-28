@@ -42,14 +42,14 @@ sub get_entry_by_category {
 sub comments {
     my ($self, %args) = @_;
     
-    my $page = $args{page} || 1;
-    my $limit = $args{limit} || 5;
-    my $offset = ($page - 1) * $limit;
+    #my $page = $args{page} || 1;
+    #my $limit = $args{limit} || 5;
+    #my $offset = ($page - 1) * $limit;
     
     return moco("Comment")->search(
         where => { entry_id => $self->id },
-        limit => $limit,
-        offset => $offset,
+        #limit => $limit,
+        #offset => $offset,
         order => 'created_on DESC',
     );
 }

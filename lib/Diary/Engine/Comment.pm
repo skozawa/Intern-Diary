@@ -23,8 +23,8 @@ sub _add_post {
     my ($self, $r) = @_;
     
     $r->req->form(
-        entry_id => [ 'UINT' ],
-        content => [ 'NOT_BLANK' ],
+        entry_id => ['NOT_BLANK','UINT'],
+        content => ['NOT_BLANK'],
     );
     
     if (not $r->req->form->has_error) {
@@ -36,6 +36,9 @@ sub _add_post {
             content => $content,
         );
         
+        $r->res->redirect("/diary?id=$entry_id");
+    } else {
+        my $entry_id = $r->req->param('entry_id');
         $r->res->redirect("/diary?id=$entry_id");
     }
 }
@@ -54,8 +57,8 @@ sub _delete_post {
     my ($self, $r) = @_;
     
     $r->req->form(
-        entry_id => [ 'UINT' ],
-        cid => [ 'UINT' ],
+        entry_id => ['NOT_BLANK','UINT'],
+        cid => ['NOT_BLANK','UINT'],
     );
     
     if (not $r->req->form->has_error) {
@@ -64,6 +67,9 @@ sub _delete_post {
         
         my $comment = $r->user->delete_comment( comment_id => $cid );
         
+        $r->res->redirect("/diary?id=$entry_id");
+    } else {
+        my $entry_id = $r->req->param('entry_id');
         $r->res->redirect("/diary?id=$entry_id");
     }
 }

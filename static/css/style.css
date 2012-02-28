@@ -58,13 +58,13 @@ body {
 
 #entry_list header {
 	display: block;
-	margin-left: 5px;
+	margin: 0 5px 0 5px;
 	font-size: 15px;
 }
 
 #entry_list p {
 	display: block;
-	margin-left: 10px;
+	margin: 0 10px 0 10px;
 	font-size: 14px;
 }
 
@@ -75,6 +75,24 @@ body {
 	font-size: 12px;
 }
 
+#pager {
+	width: 100%;
+	font-size: 13px;
+}
+
+#pager #next {
+	width: 10%;
+	text-align: left;
+}
+
+#pager #center {
+	width: 80%;
+}
+
+#pager #pre {
+	width: 10%;
+	text-align: right;
+}
 
 /* diary.html */
 .entry {
@@ -276,7 +294,7 @@ div.category footer {
 
 #mypage #entry_list {
 	margin: auto;
-	padding-left: 10px;
+	padding: 0 10px 0 10px;
 	border: 1px inset #000000;
 	width: 90%;
 	font-size: 16px;

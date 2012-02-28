@@ -3,6 +3,7 @@
 [% IF entries.size %]
  <div id="mypage">
   <div id="entry_info">
+    <p>日記数：[% entry_size | html %]</p>
     <p><a href="/diary.add">日記を書く</a></p>
   </div>
   <div id="entry_list">
@@ -25,7 +26,23 @@
 	  </td>
     </section>
     </tr>
-   [% END %]
+    [% END %]
+    <table id="pager">
+     <hr>
+     <tr>
+      <td id="next">
+       [% IF page != 1 %]
+        <a href="/index.mypage?page=[% page - 1 | uri %]">次</a>
+       [% END %]
+      </td>
+      <td id="center"></td>
+      <td id="pre">
+       [% IF has_pre == 1 %]
+        <a href="/index.mypage?page=[% page + 1 | uri %]">前</a>
+       [% END %]
+      </td>
+     </tr>
+    </table>
    </table>
   </div>
  </div>

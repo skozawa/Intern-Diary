@@ -16,7 +16,7 @@ sub categories {
     my ($self, %args) = @_;
     
     my $page = $args{page} || 1;
-    my $limit = $args{limit} || 10;
+    my $limit = $args{limit} || 5;
     my $offset = ($page - 1) * $limit;
     
     return $self->search(
@@ -39,21 +39,6 @@ sub get_category_by_entry {
     
     return $self->search( where => { id => { -in => [@category_ids] } } );
 }
-
-## entryでカテゴリを検索
-sub get_category_by_entries {
-    my ($self, $entries) = @_;
-    
-    my @entry_ids = map { $_->id } @$entries;
-    return if(!@entry_ids);
-    
-    my @category_ids = map { $_->category_id}
-        moco('Rel_entry_category')->search( where => { entry_id => { -in => [@entry_ids] } } );
-    return if(!@category_ids);
-    
-    return $self->search( where => { id => { -in => [@category_ids] } } );
-}
-
 
 sub as_string {
     my ($self) = shift;

@@ -15,7 +15,7 @@ sub entries {
     my ($self, %args) = @_;
     
     my $page = $args{page} || 1;
-    my $limit = $args{limit} || 5;
+    my $limit = $args{limit} || 3;
     my $offset = ($page - 1) * $limit;
     
     return moco("Entry")->search(
@@ -24,6 +24,13 @@ sub entries {
          offset => $offset,
          order => 'created_on DESC',
     );
+}
+
+## ユーザの書いたエントリ数
+sub entry_size {
+    my ($self) = @_;
+    
+    return moco('Entry')->count(user_id => $self->id);
 }
 
 ## 日記の追加

@@ -10,20 +10,28 @@ use Carp qw(croak);
 sub default : Public {
     my ($self, $r) = @_;
     
-    my $id = $r->req->param('id');
-    my $entry = moco('Entry')->find(id => $id);
-    my $entry_user = moco('User')->find(id => $entry->user_id);
-    my $categories = moco('Category')->get_category_by_entry(entry_id => $entry->id);
-    my $comments = $entry->comments();
-    my $comment_users = $self->comment_users($comments);
-    
-    $r->stash->param(
-        entry => $entry,
-        entry_user => $entry_user,
-        categories => $categories,
-        comments => $comments,
-        comment_users => $comment_users,
+    $r->req->form(
+        id => ['NOT_BLANK','UINT'],
     );
+    
+    if (not $r->req->form->has_error) {
+        my $id = $r->req->param('id');
+        my $entry = moco('Entry')->find(id => $id);
+        my $entry_user = moco('User')->find(id => $entry->user_id);
+        my $categories = moco('Category')->get_category_by_entry(entry_id => $entry->id);
+        my $comments = $entry->comments();
+        my $comment_users = $self->comment_users($comments);
+    
+        $r->stash->param(
+            entry => $entry,
+            entry_user => $entry_user,
+            categories => $categories,
+            comments => $comments,
+            comment_users => $comment_users,
+        );
+    } else {
+        $r->res->redirect('/');
+    }
 }
 
 ## エントリの追加
@@ -40,8 +48,8 @@ sub _add_post {
     my ($self, $r) = @_;
     
     $r->req->form(
-        title => [ 'NOT_BLANK' ],
-        body => [ 'NOT_BLANK' ],
+        title => ['NOT_BLANK'],
+        body => ['NOT_BLANK'],
     );
     
     if (not $r->req->form->has_error) {
@@ -59,7 +67,7 @@ sub _add_post {
             category => $category,
             entry_id => $entry->id,
         );
-    
+        
         $r->res->redirect('/');
     }
 }
@@ -93,7 +101,7 @@ sub _delete_post {
     my ($self, $r) = @_;
     
     $r->req->form(
-        entry_id => [ 'UINT' ],
+        entry_id => ['NOT_BLANK','UINT'],
     );
     
     if (not $r->req->form->has_error) {
@@ -133,9 +141,9 @@ sub _edit_post {
     my ($self, $r) = @_;
 
     $r->req->form(
-        id => [ 'UINT' ],
-        title => [ 'NOT_BLANK' ],
-        body => [ 'NOT_BLANK' ],
+        id => ['NOT_BLANK','UINT'],
+        title => ['NOT_BLANK'],
+        body => ['NOT_BLANK'],
     );
     
     if (not $r->req->form->has_error) {
@@ -143,7 +151,7 @@ sub _edit_post {
         my $title = $r->req->param('title');
         my $category = $r->req->param('category');
         my $body = $r->req->param('body');
-    
+        
         ## エントリの編集
         my $entry = $r->user->edit_entry (
             entry_id => $id,
@@ -160,7 +168,7 @@ sub search : Public {
     my ($self, $r) = @_;
     
     $r->req->form(
-        query => [ 'NOT_BLANK' ],
+        query => ['NOT_BLANK'],
     );
     
     if (not $r->req->form->has_error) {
