@@ -17,6 +17,10 @@ sub default : Public {
     if (not $r->req->form->has_error) {
         my $id = $r->req->param('id');
         my $entry = moco('Entry')->find(id => $id);
+        if ( !$entry ) {
+            $r->res->redirect('/');
+            return;
+        }
         my $entry_user = moco('User')->find(id => $entry->user_id);
         my $categories = moco('Category')->get_category_by_entry(entry_id => $entry->id);
         my $comments = $entry->comments();
@@ -169,20 +173,32 @@ sub search : Public {
     
     $r->req->form(
         query => ['NOT_BLANK'],
+        page => ['UINT'],
     );
     
     if (not $r->req->form->has_error) {
+        my $page = $r->req->param('page') || 1;
+        my $limit = 3;
+        
         my $query = $r->req->param('query');
-        my $entries = $r->user->search_entry( query => $query );
+        my $entries = $r->user->search_entry( query => $query, page => $page );
         my $categories;
         for my $entry (@$entries) {
             $categories->{$entry->id} = moco('Category')->get_category_by_entry( entry_id => $entry->id );
         }
+        my @user_ids = map { $_->user_id } @$entries;
+        my $entry_users = $self->entry_users(\@user_ids);
+        
+        my $result_size = $r->user->search_result_size($query);
+        my $has_next = $page * $limit < $result_size ? 1 : 0;
         
         $r->stash->param(
             query => $query,
             entries => $entries,
             categories => $categories,
+            entry_users => $entry_users,
+            page => $page,
+            has_next => $has_next,
         );
     }
 }
@@ -202,6 +218,20 @@ sub comment_users {
         $comment_users->{$_->id} = $_;
     }
     return $comment_users;
+}
+
+## エントリを書いたユーザを取得
+sub entry_users {
+    my ($self, $user_ids) = @_;
+    
+    defined $user_ids or croak 'Required: user_ids';
+    return if (!@$user_ids);
+    
+    my $entry_users;
+    for ( moco('User')->search( where => { id => {-in => [@$user_ids]} } ) ) {
+        $entry_users->{$_->id} = $_;
+    }
+    return $entry_users;
 }
 
 

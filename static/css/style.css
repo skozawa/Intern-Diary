@@ -261,9 +261,9 @@ div.category {
 	margin: 5px 5px 5px 5px;
 }
 
-#category_list .category div.feed {
-	text-align: right;
+#category_list .category .feed {
 	margin-left: 15px;
+	font-size: 13px;
 }
 
 div.category header {

@@ -4,6 +4,9 @@
  <header>
   [% category.name | html %]
  </header>
+ <footer>
+  [% category.created_on | html %]
+ </footer>
  <div>
  エントリ：
  [% FOR entry IN entries %]
@@ -14,9 +17,21 @@
   </p>
  [% END %]
  </div>
- <footer>
-  [% category.created_on | html %]
- </footer>
+ <table id="pager">
+   <tr>
+    <td id="next">
+     [% IF page != 1 %]
+      <a href="/category?id=[% category.id | uri %]&page=[% page - 1 %]">前</a>
+     [% END %]
+    </td>
+    <td id="center"></td>
+    <td id="pre">
+     [% IF has_next == 1 %]
+      <a href="/category?id=[% category.id | uri %]&page=[% page + 1 %]">次</a>
+     [% END %]
+    </td>
+   </tr>
+  </table>
 </div>
 
 [% END %]

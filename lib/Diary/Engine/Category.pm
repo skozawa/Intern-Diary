@@ -15,22 +15,30 @@ sub default : Public {
     
     $r->req->form(
         id => ['NOT_BLANK','UINT'],
+        page => ['UINT'],
     );
     
     if (not $r->req->form->has_error) {
+        my $page = $r->req->param('page') || 1;
+        my $limit = 5;
+        
         my $id = $r->req->param('id');
         my $category = moco('Category')->find(id => $id);
         if ( !$category ) {
             $r->res->redirect('/category.all');
             return;
         }
-        my $entries = moco('Entry')->get_entry_by_category( cid => $id );
-        my $entry_users = $self->entry_users($entries);
+        my ($entries, $entry_size) = moco('Entry')->get_entry_by_category( cid => $id, page => $page );
+        my @user_ids = map { $_->user_id } @$entries;
+        my $entry_users = $self->entry_users(\@user_ids);
+        my $has_next = $page * $limit < $entry_size ? 1 : 0;
         
         $r->stash->param( 
             category => $category,
             entries => $entries,
             entry_users => $entry_users,
+            page => $page,
+            has_next => $has_next,
         );
     } else {
         $r->res->redirect('/category.all');
@@ -53,11 +61,10 @@ sub all : Public {
         my $entries;
         my $user_ids;
         for my $category ( @$categories ) {
-            my $entries_tmp = moco('Entry')->get_entry_by_category(cid => $category->id);
-            $entries->{ $category->id } = $entries_tmp;
-            map { push @$user_ids, $_->user_id } @$entries_tmp;
+            $entries->{ $category->id } = moco('Entry')->get_entry_by_category(cid => $category->id);
+            map { push @$user_ids, $_->user_id } @{$entries->{ $category->id }};
         }
-        my $entry_users = $self->users($user_ids);
+        my $entry_users = $self->entry_users($user_ids);
         my $category_size = moco('Category')->count;
         my $has_next = $page * $limit < $category_size ? 1 : 0;
         
@@ -85,7 +92,7 @@ sub feed_rss : Public {
         my $id = $r->req->param('id');
         
         my $category = moco('Category')->find(id => $id);
-        my $entries = moco('Entry')->get_entry_by_category( cid => $id );
+        my $entries = moco('Entry')->get_entry_by_category( cid => $id, limit => 10 );
         
         my $feed = XML::FeedPP::RSS->new();
         
@@ -121,7 +128,7 @@ sub feed_atom : Public {
         my $id = $r->req->param('id');
         
         my $category = moco('Category')->find(id => $id);
-        my $entries = moco('Entry')->get_entry_by_category( cid => $id );
+        my $entries = moco('Entry')->get_entry_by_category( cid => $id, limit => 10 );
         
         my $feed = XML::FeedPP::Atom::Atom10->new();
         
@@ -148,17 +155,6 @@ sub feed_atom : Public {
 
 ## エントリを書いたユーザを取得
 sub entry_users {
-    my ($self, $entries) = @_;
-    
-    defined $entries or croak "Required: entries";
-    
-    my @user_ids = map { $_->user_id } @$entries;
-    
-    return $self->users(\@user_ids);
-}
-
-## user_idに該当するユーザを取得
-sub users {
     my ($self, $user_ids) = @_;
     
     defined $user_ids or croak 'Required: user_ids';

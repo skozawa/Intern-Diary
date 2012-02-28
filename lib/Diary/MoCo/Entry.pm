@@ -28,7 +28,8 @@ sub get_entry_by_category {
     }
     return if(!@entry_ids);
     
-    return $self->search(
+    my $entry_size = $self->count(id => { -in => [@entry_ids] });
+    my $entries = $self->search(
         where => {
             id => { -in => [@entry_ids] },
         },
@@ -36,6 +37,7 @@ sub get_entry_by_category {
         offset => $offset,
         order => 'created_on DESC',
     );
+    return ($entries, $entry_size);
 }
 
 ## エントリに対するコメントを取得

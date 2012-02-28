@@ -128,7 +128,7 @@ sub search_entry {
     defined $args{query} && $args{query} ne "" or croak "Required: query";
     
     my $page = $args{page} || 1;
-    my $limit = $args{limit} || 5;
+    my $limit = $args{limit} || 3;
     my $offset = ($page - 1) * $limit;
     
     ## タイトルか本文にキーワードを含む日記を検索
@@ -146,7 +146,12 @@ sub search_entry {
         offset => $offset,
         order => 'created_on DESC',
     );
+}
+
+sub search_result_size {
+    my ($self, $query) = @_;
     
+    return moco('Entry')->count(['body like :query or title like :query', query => '%'.$query.'%']);
 }
 
 ## comment_idのコメントを取得

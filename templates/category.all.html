@@ -6,8 +6,8 @@
   <header>
    [<a href="category?id=[% category.id | uri %]">[% category.name | html %]</a>]
    <span class="feed">
-    <button type="button">RSS</button>
-    <button type="button">Atom</button>
+    <a href="/category.feed_rss?id=[% category.id | uri %]">RSS</a>
+    <a href="/category.feed_atom?id=[% category.id | uri %]">Atom</a>
    </span>
   </header>
   <div class="entries">
