@@ -61,8 +61,9 @@ sub all : Public {
         my $entries;
         my $user_ids;
         for my $category ( @$categories ) {
-            $entries->{ $category->id } = moco('Entry')->get_entry_by_category(cid => $category->id);
-            map { push @$user_ids, $_->user_id } @{$entries->{ $category->id }};
+            my ($entries_tmp, $entry_size) = moco('Entry')->get_entry_by_category(cid => $category->id);
+            $entries->{ $category->id } = $entries_tmp;
+            map { push @$user_ids, $_->user_id } @$entries_tmp;
         }
         my $entry_users = $self->entry_users($user_ids);
         my $category_size = moco('Category')->count;
