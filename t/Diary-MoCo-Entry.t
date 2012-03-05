@@ -45,26 +45,31 @@ sub get_entry_by_category : Tests {
     my @categories = ( "天気", "日記", "冬", "MoCo");
     
     ## カテゴリによる検索
-    my ($entries1, $entry_size1) = Diary::MoCo::Entry->get_entry_by_category( cid => 1 );
+    my $category1 = Diary::MoCo::Category->find( id => 1 );
+    my $entries1 = $category1->entries;
     is_deeply $entries1->map( sub { $_->title } )->to_a, ['test2', 'test3'], 'search: category_id 1 title';
     
-    my ($entries2, $entry_size2) = Diary::MoCo::Entry->get_entry_by_category( cid => 2 );
+    my $category2 = Diary::MoCo::Category->find( id => 2 );
+    my $entries2 = $category2->entries;
     is_deeply $entries2->map( sub { $_->body } )->to_a, ['今日は晴れです'], 'search: category_id 2 body';
     
-    my ($entries3, $entry_size3) = Diary::MoCo::Entry->get_entry_by_category( cid => 3 );
+    my $category3 = Diary::MoCo::Category->find( id => 3 );
+    my $entries3 = $category3->entries;
     is_deeply $entries3->map( sub { $_->id } )->to_a, [3], 'search: category id 3 id';
     
-    my ($entries4, $entry_size4) = Diary::MoCo::Entry->get_entry_by_category( cid => 4 );
+    my $category4 = Diary::MoCo::Category->find( id => 4 );
+    my $entries4 = $category4->entries;
     my @entry_ids4 = map { $_->id } @$entries4;
-    my $relation4 = Diary::MoCo::Rel_entry_category->search(where => {entry_id => {-in => [@entry_ids4]}});
+    my $relation4 = Diary::MoCo::RelEntryCategory->search(where => {entry_id => {-in => [@entry_ids4]}});
     is_deeply $relation4->map( sub { $_->category_id } )->to_a, [4], 'search: category id 4 category_ids';
     
-    my ($entries5, $entry_size5) = Diary::MoCo::Entry->get_entry_by_category( cid => 10 );
-    is $entries5, undef, 'search: category id undef';
+    #my $category5 = Diary::MoCo::Category->find( id => 5 );
+    #my $entries5 = $category5->entries;
+    #is_deeply $entries5, [], 'search: category id undef';
     
     ## 異常動作
-    dies_ok { Diary::MoCo::Entry->get_entry_by_category(); } 'dies_ok: not args';
-    dies_ok { Diary::MoCo::Entry->get_entry_by_category( cid => "" ); } 'dies_ok: require category_id';
+    #dies_ok { Diary::MoCo::Entry->get_entry_by_category(); } 'dies_ok: not args';
+    #dies_ok { Diary::MoCo::Entry->get_entry_by_category( cid => "" ); } 'dies_ok: require category_id';
 }
 
 

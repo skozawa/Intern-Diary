@@ -13,7 +13,7 @@
   <div>
    <p class="del_item">カテゴリ</p>
    <p class="del_category">
-    [% FOR category IN categoreis %]
+    [% FOR category IN entry.categories %]
      [% category.name | html %]
     [% END %]
    </p>

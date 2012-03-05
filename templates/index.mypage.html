@@ -13,16 +13,16 @@
     <tr>
      <section class="entry_item">
 	  <td class="entry_title">
-	   <a href="/diary?id=[% entry.id | uri %]">[% entry.title | html %]</a>
+	   <a href="/diary?id=[% entry.id | uri | html %]">[% entry.title | html %]</a>
 	  </td>
 	  <td>
 	   ([% entry.created_on | html %])
 	  </td>
 	  <td>
-       <button type="button" onClick="location.href='/diary.edit?id=[% entry.id | uri %]'">編集</button>
+       <button type="button" onClick="location.href='/diary.edit?id=[% entry.id | uri | html %]'">編集</button>
 	  </td>
 	  <td>
-	   <button type="button" onClick="location.href='/diary.delete?id=[% entry.id | uri %]'">削除</button>
+	   <button type="button" onClick="location.href='/diary.delete?id=[% entry.id | uri | html %]'">削除</button>
 	  </td>
     </section>
     </tr>
@@ -32,13 +32,13 @@
      <tr>
       <td id="next">
        [% IF page != 1 %]
-        <a href="/index.mypage?page=[% page - 1 | uri %]">次</a>
+        <a href="/index.mypage?page=[% page - 1 | uri | html %]">次</a>
        [% END %]
       </td>
       <td id="center"></td>
       <td id="pre">
        [% IF has_pre == 1 %]
-        <a href="/index.mypage?page=[% page + 1 | uri %]">前</a>
+        <a href="/index.mypage?page=[% page + 1 | uri | html %]">前</a>
        [% END %]
       </td>
      </tr>

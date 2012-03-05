@@ -20,16 +20,11 @@ sub default : Public {
             my $limit = 3;
             
             my $entries = $user->entries(page => $page);
-            my $categories;
-            for my $entry (@$entries) {
-                $categories->{$entry->id} = moco('Category')->get_category_by_entry( entry_id => $entry->id );
-            }
             my $entry_size = $user->entry_size;
             my $has_pre = $page * $limit < $entry_size ? 1 : 0;
             
             $r->stash->param(
                 entries => $entries,
-                categories => $categories,
                 page => $page,
                 has_pre => $has_pre,
             );

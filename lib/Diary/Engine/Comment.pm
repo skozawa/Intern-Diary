@@ -16,9 +16,6 @@ sub add : Public {
     $r->follow_method;
 }
 
-sub _add_get {
-}
-
 sub _add_post {
     my ($self, $r) = @_;
     
@@ -48,9 +45,6 @@ sub delete : Public {
     my ($self, $r) = @_;
     
     $r->follow_method;
-}
-
-sub _delete_get {
 }
 
 sub _delete_post {

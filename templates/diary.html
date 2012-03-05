@@ -2,12 +2,12 @@
 
 <div id="entry">
  <header>
-  <span class="user">id:[% entry_user.name | html %]の日記</span>
+  <span class="user">id:[% entry.user.name | html %]の日記</span>
   <span class="title">[% entry.title | html %]</span>
   <span class="category">
   [
-  [% FOR category IN categories %]
-   <a href="/category?id=[% category.id | uri %]">[% category.name | html %]</a>
+  [% FOR category IN entry.categories %]
+   <a href="/category?id=[% category.id | uri | html %]">[% category.name | html %]</a>
   [% END %]
   ]
   </span>
@@ -21,10 +21,10 @@
 
  <div id="comments">
  コメント
- [% FOR comment IN comments %]
+ [% FOR comment IN entry.comments %]
   <section class="comment">
    <header>
-    [% comment_users.item("$comment.user_id").name | html %]
+    [% comment.user.name | html %]
 	<span class="time">([% comment.created_on | html %])</span>
    </header>
    <p>

@@ -12,33 +12,23 @@ __PACKAGE__->table('entry');
 __PACKAGE__->utf8_columns(qw(title body));
 
 
-## カテゴリIDを用いた日記の取得
-sub get_entry_by_category {
-    my ($self, %args) = @_;
+sub user {
+    my $self = shift;
     
-    defined $args{cid} && $args{cid} ne "" or croak "Required: category_id";
-    
-    my $page = $args{page} || 1;
-    my $limit = $args{limit} || 5;
-    my $offset = ($page - 1) * $limit;
-    
-    my @entry_ids;
-    for (moco("Rel_entry_category")->search( where => { category_id => $args{cid} })) {
-        push @entry_ids, $_->entry_id;
-    }
-    return if(!@entry_ids);
-    
-    my $entry_size = $self->count(id => { -in => [@entry_ids] });
-    my $entries = $self->search(
-        where => {
-            id => { -in => [@entry_ids] },
-        },
-        limit => $limit,
-        offset => $offset,
-        order => 'created_on DESC',
-    );
-    return ($entries, $entry_size);
+    return moco('User')->find(id => $self->user_id);
 }
+
+sub categories {
+    my $self = shift;
+    
+    my @category_ids = map { $_->category_id }
+        moco('RelEntryCategory')->search( where => { entry_id => $self->id } );
+    
+    return [] if (!@category_ids);
+    
+    return moco('Category')->search( where => { id => { -in => [@category_ids] } } );
+}
+
 
 ## エントリに対するコメントを取得
 sub comments {

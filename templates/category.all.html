@@ -6,15 +6,15 @@
   <header>
    [<a href="category?id=[% category.id | uri %]">[% category.name | html %]</a>]
    <span class="feed">
-    <a href="/category.feed_rss?id=[% category.id | uri %]">RSS</a>
-    <a href="/category.feed_atom?id=[% category.id | uri %]">Atom</a>
+    <a href="/category.feed_rss?id=[% category.id | uri | html %]">RSS</a>
+    <a href="/category.feed_atom?id=[% category.id | uri | html %]">Atom</a>
    </span>
   </header>
   <div class="entries">
-   [% FOR entry IN entries.item("$category.id") %]
+   [% FOR entry IN category.entries %]
     <p>
-     <a href="diary?id=[% entry.id | uri %]">[% entry.title | html %]</a>,
-     id:[% entry_users.item("$entry.user_id").name | html %]
+     <a href="diary?id=[% entry.id | uri | html %]">[% entry.title | html %]</a>,
+     id:[% entry.user.name | html %]
 	</p>
    [% END %]
   </div>
@@ -27,13 +27,13 @@
   <tr>
    <td id="next">
     [% IF page != 1 %]
-     <a href="/category.all?page=[% page - 1 | uri %]">前</a>
+     <a href="/category.all?page=[% page - 1 | uri | html %]">前</a>
     [% END %]
    </td>
    <td id="center"></td>
    <td id="pre">
     [% IF has_next == 1 %]
-     <a href="/category.all?page=[% page + 1 | uri %]">次</a>
+     <a href="/category.all?page=[% page + 1 | uri | html %]">次</a>
     [% END %]
    </td>
   </tr>

@@ -1,4 +1,4 @@
-package Diary::MoCo::Rel_entry_category;
+package Diary::MoCo::RelEntryCategory;
 
 use strict;
 use warnings;

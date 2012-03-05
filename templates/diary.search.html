@@ -2,7 +2,7 @@
 
 <div id="search_results">
 [% IF query %]
-検索語：[% query %]
+検索語：[% query | html %]
 [% ELSE  %]
 検索語がありません。
 [% END %]
@@ -12,14 +12,14 @@
   [% FOR entry IN entries %]
    <section class="entry">
     <header>
-     <a href="/diary?id=[% entry.id | uri %]">[% entry.title | html %]</a>
+     <a href="/diary?id=[% entry.id | uri | html %]">[% entry.title | html %]</a>
 	 <span class="entry_attr">
 	 [
-     [% FOR category IN categories.item("$entry.id") %]
-      <a href="/category?id=[% category.id | uri %]">[% category.name | html %]</a>
+	 [% FOR category IN entry.categories %]
+      <a href="/category?id=[% category.id | uri | html %]">[% category.name | html %]</a>
      [% END %]
 	 ]
-     id:[% entry_users.item("$entry.user_id").name | html %]
+     id:[% entry.user.name | html %]
 	 ([% entry.created_on | html %])
 	 </span>
 	</header>
@@ -30,13 +30,13 @@
    <tr>
     <td id="next">
      [% IF page != 1 %]
-      <a href="/diary.search?query=[% query | uri %]&page=[% page - 1 %]">前</a>
+      <a href="/diary.search?query=[% query | uri | html %]&page=[% page - 1 %]">前</a>
      [% END %]
     </td>
     <td id="center"></td>
     <td id="pre">
      [% IF has_next == 1 %]
-      <a href="/diary.search?query=[% query | uri %]&page=[% page + 1 %]">次</a>
+      <a href="/diary.search?query=[% query | uri | html %]&page=[% page + 1 %]">次</a>
      [% END %]
     </td>
    </tr>

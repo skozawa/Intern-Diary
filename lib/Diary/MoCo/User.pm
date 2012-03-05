@@ -63,7 +63,7 @@ sub add_category {
             ## カテゴリ追加
             $category = moco("Category")->create(name => $c);
         }
-        moco("Rel_entry_category")->create(
+        moco("RelEntryCategory")->create(
             entry_id => $args{entry_id},
             category_id => $category->id,
         );
@@ -83,7 +83,7 @@ sub delete_entry {
     $entry->delete;
     
     ## カテゴリの削除
-    foreach my $relation ( moco("Rel_entry_category")->search( where => { entry_id => $entry->id } )) {
+    foreach my $relation ( moco("RelEntryCategory")->search( where => { entry_id => $entry->id } )) {
         $relation->delete;
     }
     ## コメントの削除
@@ -110,10 +110,8 @@ sub edit_entry {
     $entry->title($args{title});
     $entry->body($args{body});
     
-    return if( $args{category} eq "" );
-    
     ## カテゴリとエントリの関係を削除
-    foreach my $relation ( moco("Rel_entry_category")->search( where => { entry_id => $entry->id } )) {
+    foreach my $relation ( moco("RelEntryCategory")->search( where => { entry_id => $entry->id } )) {
         $relation->delete;
     }
     $self->add_category( entry_id => $entry->id, category => $args{category} );

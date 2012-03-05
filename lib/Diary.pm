@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use base qw/Ridge/;
 use Diary::MoCo;
+use Ridge::Exceptions;
 
 __PACKAGE__->configure;
 
@@ -25,6 +26,7 @@ __PACKAGE__->add_trigger(
         
         if (not ($self->req->env->{'hatena.user'} || $self->req->env->{'twitter.user'})) {
             $self->res->redirect('/index.login');
+            Ridge::Exception::RequestError->throw(code => 302);
             return;
         }
     }

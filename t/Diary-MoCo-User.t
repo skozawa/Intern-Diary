@@ -42,14 +42,14 @@ sub t01_add_entry : Tests {
     my $entry2 = $user->add_entry(%{$entries[1]});
     $user->add_category(category => $entries[1]->{category}, entry_id => $entry2->id);
     is $entry2->body, $entries[1]->{body}, '$entry2 body';
-    my $relation2 = Diary::MoCo::Rel_entry_category->search(where => {entry_id => $entry2->id});
+    my $relation2 = Diary::MoCo::RelEntryCategory->search(where => {entry_id => $entry2->id});
     is_deeply $relation2->map( sub { $_->category_id } )->to_a, [1,2], '$entry2 category id';
     
     ## Entry3の追加
     my $entry3 = $user->add_entry(%{$entries[2]});
     $user->add_category(category => $entries[2]->{category}, entry_id => $entry3->id);
     is $entry3->title, $entries[2]->{title}, '$entry3 title';
-    my $relation3 = Diary::MoCo::Rel_entry_category->search(where => {entry_id => $entry3->id});
+    my $relation3 = Diary::MoCo::RelEntryCategory->search(where => {entry_id => $entry3->id});
     is_deeply $relation3->map( sub { $_->category_id } )->to_a, [1,3], '$entry3 category id';
     
     ## Entry4の追加
@@ -138,7 +138,7 @@ sub t03_edit_entry : Tests {
     isa_ok $entry2, 'Diary::MoCo::Entry';
     is $entry2->title, $entry_titles[0], '$entry2 title';
     is $entry2->body, $entry_bodies[0], '$entry2 body';
-    my $relation2 = Diary::MoCo::Rel_entry_category->search(where => {entry_id => $entry2->id});
+    my $relation2 = Diary::MoCo::RelEntryCategory->search(where => {entry_id => $entry2->id});
     is_deeply $relation2->map( sub { $_->category_id } )->to_a, [1,5], '$entry2 category id';
     
     ## 異常動作

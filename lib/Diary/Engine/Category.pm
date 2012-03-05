@@ -28,15 +28,12 @@ sub default : Public {
             $r->res->redirect('/category.all');
             return;
         }
-        my ($entries, $entry_size) = moco('Entry')->get_entry_by_category( cid => $id, page => $page );
-        my @user_ids = map { $_->user_id } @$entries;
-        my $entry_users = $self->entry_users(\@user_ids);
-        my $has_next = $page * $limit < $entry_size ? 1 : 0;
+        my $entries = $category->entries( page => $page );
+        my $has_next = $page * $limit < $category->entry_size ? 1 : 0;
         
         $r->stash->param( 
             category => $category,
             entries => $entries,
-            entry_users => $entry_users,
             page => $page,
             has_next => $has_next,
         );
@@ -58,21 +55,11 @@ sub all : Public {
         my $limit = 5;
         
         my $categories = moco('Category')->categories(page => $page);
-        my $entries;
-        my $user_ids;
-        for my $category ( @$categories ) {
-            my ($entries_tmp, $entry_size) = moco('Entry')->get_entry_by_category(cid => $category->id);
-            $entries->{ $category->id } = $entries_tmp;
-            map { push @$user_ids, $_->user_id } @$entries_tmp;
-        }
-        my $entry_users = $self->entry_users($user_ids);
         my $category_size = moco('Category')->count;
         my $has_next = $page * $limit < $category_size ? 1 : 0;
         
         $r->stash->param(
             categories => $categories,
-            entries => $entries,
-            entry_users => $entry_users,
             page => $page,
             has_next => $has_next,
         );
@@ -93,17 +80,17 @@ sub feed_rss : Public {
         my $id = $r->req->param('id');
         
         my $category = moco('Category')->find(id => $id);
-        my $entries = moco('Entry')->get_entry_by_category( cid => $id, limit => 10 );
+        my $entries = $category->entries(limit => 10);
         
         my $feed = XML::FeedPP::RSS->new();
         
         $feed->title($category->name);
-        $feed->link($r->config->app_config('default')->{uri});
+        $feed->link($r->config->app_config->param('uri'));
         $feed->description("カテゴリ「".$category->name."」の日記");
         
         foreach my $entry ( @$entries ) {
             $feed->add_item (
-                link => $r->config->app_config('default')->{uri}.'diary?id='.$entry->id,
+                link => $r->config->app_config->param('uri').'diary?id='.$entry->id,
                 title => $entry->title,
                 description => (split(/\n/,$entry->body))[0],
                 pubData => $entry->created_on->strftime('%Y-%m-%dT%H:%M:%S%z'),
@@ -129,17 +116,17 @@ sub feed_atom : Public {
         my $id = $r->req->param('id');
         
         my $category = moco('Category')->find(id => $id);
-        my $entries = moco('Entry')->get_entry_by_category( cid => $id, limit => 10 );
+        my $entries = $category->entries(limit => 10);
         
         my $feed = XML::FeedPP::Atom::Atom10->new();
         
         $feed->title($category->name);
-        $feed->link($r->config->app_config('default')->{uri});
+        $feed->link($r->config->app_config->param('uri'));
         $feed->description("カテゴリ「".$category->name."」の日記");
         
         foreach my $entry ( @$entries ) {
             $feed->add_item (
-                link => $r->config->app_config('default')->{uri}.'diary?id='.$entry->id,
+                link => $r->config->app_config->param('uri').'diary?id='.$entry->id,
                 title => $entry->title,
                 content => $entry->body,
                 pubData => $entry->created_on->strftime('%Y-%m-%dT%H:%M:%S%z'),
@@ -154,18 +141,5 @@ sub feed_atom : Public {
     }
 }
 
-## エントリを書いたユーザを取得
-sub entry_users {
-    my ($self, $user_ids) = @_;
-    
-    defined $user_ids or croak 'Required: user_ids';
-    return if (!@$user_ids);
-    
-    my $entry_users;
-    for ( moco('User')->search( where => { id => {-in => [@$user_ids]} } ) ) {
-        $entry_users->{$_->id} = $_;
-    }
-    return $entry_users;
-}
 
 1;

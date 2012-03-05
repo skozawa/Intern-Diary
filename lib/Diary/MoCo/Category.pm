@@ -26,19 +26,41 @@ sub categories {
     );
 }
 
-## entry_idでカテゴリを検索
-sub get_category_by_entry {
+sub entries {
     my ($self, %args) = @_;
     
-    defined $args{entry_id} && $args{entry_id} ne "" or croak "Required: entry_id";
+    my $page = $args{page} || 1;
+    my $limit = $args{limit} || 5;
+    my $offset = ( $page - 1 ) * $limit;
     
-    my @category_ids = map { $_->category_id }
-        moco('Rel_entry_category')->search( where => { entry_id => $args{entry_id} } );
-
-    return if(!@category_ids);
+    my @entry_ids;
+    for (moco('RelEntryCategory')->search( where => { category_id => $self->id } )) {
+        push @entry_ids, $_->entry_id;
+    }
+    return [] if (!@entry_ids);
     
-    return $self->search( where => { id => { -in => [@category_ids] } } );
+    return moco('Entry')->search(
+        where => {
+            id => { -in => [@entry_ids] },
+        },
+        limit => $limit,
+        offset => $offset,
+        order => 'created_on DESC',
+    );
 }
+
+sub entry_size {
+    my $self = shift;
+    
+    my @entry_ids;
+    for (moco('RelEntryCategory')->search( where => { category_id => $self->id } )) {
+        push @entry_ids, $_->entry_id;
+    }
+    return 0 if (!@entry_ids);
+    
+    return $self->count( id => { -in => [@entry_ids] } );
+}
+
 
 sub as_string {
     my ($self) = shift;

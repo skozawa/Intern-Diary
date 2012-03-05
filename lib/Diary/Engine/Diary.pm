@@ -21,17 +21,8 @@ sub default : Public {
             $r->res->redirect('/');
             return;
         }
-        my $entry_user = moco('User')->find(id => $entry->user_id);
-        my $categories = moco('Category')->get_category_by_entry(entry_id => $entry->id);
-        my $comments = $entry->comments();
-        my $comment_users = $self->comment_users($comments);
-    
         $r->stash->param(
             entry => $entry,
-            entry_user => $entry_user,
-            categories => $categories,
-            comments => $comments,
-            comment_users => $comment_users,
         );
     } else {
         $r->res->redirect('/');
@@ -80,25 +71,22 @@ sub _add_post {
 sub delete : Public {
     my ($self, $r) = @_;
     
-    my $id = $r->req->param('id');
-    my $entry = $id ? moco('Entry')->find( id => $id, user_id => $r->user->id ) : undef;
-    my $categories = $entry ? moco('Category')->get_category_by_entry(entry_id => $entry->id) : undef;
-    
-    ## エントリの確認
-    if ( !$entry ) {
-        $r->res->redirect('/');
-        return;
+    if (my $user = $r->user) {
+        my $id = $r->req->param('id');
+        my $entry = $id ? moco('Entry')->find( id => $id, user_id => $user->id ) : undef;
+        
+        ## エントリの確認
+        if ( !$entry ) {
+            $r->res->redirect('/');
+            return;
+        }
+        
+        $r->stash->param(
+            entry => $entry,
+        );
+        
+        $r->follow_method;
     }
-    
-    $r->stash->param(
-        entry => $entry,
-        categories => $categories,
-    );
-    
-    $r->follow_method;
-}
-
-sub _delete_get {
 }
 
 sub _delete_post {
@@ -119,23 +107,23 @@ sub _delete_post {
 sub edit : Public {
     my ($self, $r) = @_;
     
-    my $id = $r->req->param('id');
-    my $entry = $id ? moco('Entry')->find( id => $id, user_id => $r->user->id ) : undef;
-    my $categories = $entry ? moco('Category')->get_category_by_entry( entry_id => $entry->id ) : undef;
-    my @category = map {$_->name} @$categories;
-    
-    ## エントリが存在するか
-    if ( !$entry ) {
-        $r->res->redirect('/');
-        return;
+    if (my $user = $r->user) {
+        my $id = $r->req->param('id');
+        my $entry = $id ? moco('Entry')->find( id => $id, user_id => $user->id ) : undef;
+        ## エントリが存在するか
+        if ( !$entry ) {
+            $r->res->redirect('/');
+            return;
+        }
+        my @category = map {$_->name} @{$entry->categories};
+        
+        $r->stash->param(
+            entry => $entry,
+            category => join(",",@category),
+        );
+        
+        $r->follow_method;
     }
-    
-    $r->stash->param(
-        entry => $entry,
-        category => join(",",@category),
-    );
-    
-    $r->follow_method;
 }
 
 sub _edit_get {
@@ -182,12 +170,6 @@ sub search : Public {
         
         my $query = $r->req->param('query');
         my $entries = $r->user->search_entry( query => $query, page => $page );
-        my $categories;
-        for my $entry (@$entries) {
-            $categories->{$entry->id} = moco('Category')->get_category_by_entry( entry_id => $entry->id );
-        }
-        my @user_ids = map { $_->user_id } @$entries;
-        my $entry_users = $self->entry_users(\@user_ids);
         
         my $result_size = $r->user->search_result_size($query);
         my $has_next = $page * $limit < $result_size ? 1 : 0;
@@ -195,43 +177,10 @@ sub search : Public {
         $r->stash->param(
             query => $query,
             entries => $entries,
-            categories => $categories,
-            entry_users => $entry_users,
             page => $page,
             has_next => $has_next,
         );
     }
-}
-
-## コメントしたユーザの獲得
-sub comment_users {
-    my ($self, $comments) = @_;
-    
-    defined $comments or croak "Required: comments";
-    ## ユーザID
-    my @user_ids = map { $_->user_id } @$comments;
-    return if (!@user_ids);
-    
-    my $comment_users;
-    ## ユーザを検索し、ハッシュ形式に変換
-    for ( moco('User')->search(where => { id => {-in => [@user_ids]} }) ) {
-        $comment_users->{$_->id} = $_;
-    }
-    return $comment_users;
-}
-
-## エントリを書いたユーザを取得
-sub entry_users {
-    my ($self, $user_ids) = @_;
-    
-    defined $user_ids or croak 'Required: user_ids';
-    return if (!@$user_ids);
-    
-    my $entry_users;
-    for ( moco('User')->search( where => { id => {-in => [@$user_ids]} } ) ) {
-        $entry_users->{$_->id} = $_;
-    }
-    return $entry_users;
 }
 
 
