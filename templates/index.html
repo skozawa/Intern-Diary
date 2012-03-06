@@ -27,7 +27,9 @@
       <a href="/?page=[% page - 1 %]">次</a>
      [% END %]
     </td>
-    <td id="center"></td>
+    <td id="center">
+     <img id="arrow" src="images/arrow.png" onClick="alert([% page %])"/>
+    </td>
     <td id="pre">
      [% IF has_pre == 1 %]
       <a href="/?page=[% page + 1 %]">前</a>

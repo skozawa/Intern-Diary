@@ -86,7 +86,13 @@ body {
 }
 
 #pager #center {
+	text-align: center;
 	width: 80%;
+}
+
+#arrow {
+	width: 30px;
+	height: 30px;
 }
 
 #pager #pre {
