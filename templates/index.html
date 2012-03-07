@@ -20,24 +20,26 @@
 	</footer>
    </section>
   [% END %]
-  <table id="pager">
-   <tr>
-    <td id="next">
-     [% IF page != 1 %]
-      <a href="/?page=[% page - 1 %]">次</a>
-     [% END %]
-    </td>
-    <td id="center">
-     <img id="arrow" src="images/arrow.png" onClick="alert([% page %])"/>
-    </td>
-    <td id="pre">
-     [% IF has_pre == 1 %]
-      <a href="/?page=[% page + 1 %]">前</a>
-     [% END %]
-    </td>
-   </tr>
-  </table>
  </div>
+ <table id="pager">
+  <tr>
+   <td id="next">
+    [% IF page != 1 %]
+     <a id="next_link" href="/?page=[% page - 1 %]">次</a>
+    [% END %]
+   </td>
+   <td id="center">
+    [% IF has_pre == 1 %]
+     <img id="arrow_down" src="images/arrow_down.png" OnClick="PM.add()"/>
+    [% END %]
+   </td>
+   <td id="pre">
+    [% IF has_pre == 1 %]
+     <a id="pre_link" href="/?page=[% page + 1 %]">前</a>
+    [% END %]
+   </td>
+  </tr>
+ </table>
 [% ELSE %]
  <div>
   <p>まだ日記がありません</p>
@@ -46,3 +48,12 @@
 [% END %]
 
 [% END %]
+
+<script type="text/javascript" src="js/Ten.js"></script>
+<script type="text/javascript" src="js/prototype.js"></script>
+<script type="text/javascript" src="js/diary.js"></script>
+<script type="text/javascript">
+<!--
+var PM = new PageManager([% page %]);
+-->
+</script>

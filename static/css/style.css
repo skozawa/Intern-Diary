@@ -90,7 +90,12 @@ body {
 	width: 80%;
 }
 
-#arrow {
+#arrow_up {
+	width: 30px;
+	height: 30px;
+}
+
+#arrow_down {
 	width: 30px;
 	height: 30px;
 }

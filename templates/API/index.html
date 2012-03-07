@@ -1,0 +1,26 @@
+{
+"entries": 
+{
+[% IF entries.size %]
+ [% FOR entry IN entries %]
+  "[% entry.id | uri | html %]" :
+  {
+   "title" : "[% entry.title | html %]",
+   "categories" : 
+   {
+    [% FOR category IN entry.categories %]
+      "[% category.id | uri | html %]" : 
+      {
+         "name" : "[% category.name | html %]",
+      }
+    [% END %]
+   },
+   "body" : "[% entry.body | html %]",
+   "created_on" : "[% entry.created_on | html %]",
+  },
+ [% END %]
+[% END %]
+},
+"page": [% page | html %],
+"has_pre": [% has_pre | html %],
+}
