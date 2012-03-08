@@ -284,7 +284,7 @@ div.category header {
 }
 
 div.category .entries {
-	display block;
+	display: block;
 	margin-left: 15px;
 }
 
@@ -320,4 +320,21 @@ div.category footer {
 
 #mypage #entry_list .entry_title {
 	width: 50%;
+}
+
+#timer {
+	width: 75px;
+}
+
+#time {
+	height: 20px;
+	text-align: center;
+	border: 1px solid #000000;
+}
+
+.timerbutton {
+	position: relative;
+	top: -10px;
+	width: 25px;
+	height: 25px;
 }
