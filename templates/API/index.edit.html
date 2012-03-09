@@ -1,0 +1,11 @@
+{
+"id" : "[% entry.id | html %]",
+"title" : "[% entry.title | html %]",
+"categories" : {
+ [% FOR category IN entry.categories %]
+  "[% category.id | html %]" : "[% category.name | html %]",
+ [% END %]
+},
+"body" : "[% entry.body | html %]",
+"created_on" : "[% entry.created_on | html %]",
+}

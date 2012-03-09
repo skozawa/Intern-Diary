@@ -74,6 +74,58 @@
 			return html;
 		},
 		
+		postEntry : function () {
+			var edit = this;
+			var data = this.makePostData();
+			
+			$.ajax ({
+				url : "/API/index.edit",
+				type : "POST",
+				data : data,
+				datatype : "json",
+				success : function (res) { edit.successAjax(res); },
+				error : edit.errorAjax,
+				complete : function () {edit.completeAjax();},
+			});
+		},
+		
+		makePostData : function () {
+			var $section = $("#entry_list").find("section#" + this.id);
+			var title = $section.find('#title').attr('value');
+			var category = $section.find('#category').attr('value');
+			var body = $section.find('#body').attr('value');
+			
+			return {
+				id : this.id,
+				title : title,
+				category : category,
+				body : body,
+			};
+		},
+		
+		successAjax : function (res) {
+			//alert("success");
+			var data = eval("(" + res + ")");
+			this.title = data.title;
+			this.categories = data.categories;
+			this.body = data.body;
+			
+			var edit = this;
+			var $section = $("#entry_list").find("section#" + this.id);
+			$section.html(this.createEntry());
+		},
+		
+		errorAjax : function () {
+			alert("error");
+			this.closeForm();
+		},
+		
+		completeAjax : function () {
+			var edit = this;
+			var $section = $("#entry_list").find("section#" + this.id);
+			$section.find('button').click(function () {	edit.openForm(); });
+		},
+		
 	});
 	
 	$.fn.editEntry = function () {
