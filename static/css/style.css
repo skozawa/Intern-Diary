@@ -338,3 +338,9 @@ div.category footer {
 	width: 25px;
 	height: 25px;
 }
+
+#temp_link {
+	text-decoration: underline;
+	color: red;
+	margin-left: 100px;
+}
