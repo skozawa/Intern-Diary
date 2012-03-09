@@ -6,11 +6,11 @@
 [% IF entries.size %]
  <div id="entry_list">
   [% FOR entry IN entries %]
-   <section class="entry_item">
+   <section class="entry_item" id="[% entry.id | html %]">
     <header><a href="/diary?id=[% entry.id | uri | html %]">[% entry.title | html %]</a>
 	[
     [% FOR category IN entry.categories %]
-      <a href="category?id=[% category.id | uri | html %]">[% category.name | html %]</a>
+      <a href="category?id=[% category.id | uri | html %]" id="[% category.id | html %]">[% category.name | html %]</a>
     [% END %]
 	]
 	</header>
@@ -57,3 +57,5 @@ var PM = new PageManager([% page %]);
 -->
 </script>
 <script type="text/javascript" src="js/Timer.js"></script>
+<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="js/Edit.js"></script>

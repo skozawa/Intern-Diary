@@ -13,7 +13,7 @@ Timer.prototype = {
 		if ( this.timerID ) {
 			return;
 		}
-		/* 終了時間を越えた場合は初期化 */
+		/* 終了時間を越えている場合は初期化 */
 		if ( this.elapsedTime > this.endTime ) {
 			this.elapsedTime = 0;
 		}
