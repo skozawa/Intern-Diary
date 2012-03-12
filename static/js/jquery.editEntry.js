@@ -179,16 +179,23 @@
 
 })(jQuery);
 
+/* 「編集」ボタンを作成 */
+var createEditButton = function () {
+	$("section").each( function () {
+		/* エントリにボタンがあるか */
+		if ( !$(this).find("button").size() ) {
+			var $button = $("<button/>");
+			$button.attr("type", "button");
+			$button.text("編集");
+			var $edit = this;
+			$button.click(function () {
+				new $.editEntry($edit.id).openForm();
+			});
+			$(this).find("header").append($button);
+		}
+	});
+}
 
 $(function() {
-	$("section").each( function () {
-		var $button = $("<button/>");
-		$button.attr("type", "button");
-		$button.text("編集");
-		var $edit = this;
-		$button.click(function () {
-			new $.editEntry($edit.id).openForm();
-		});
-		$(this).find("header").append($button);
-	});
+	createEditButton();
 });

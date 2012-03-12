@@ -19,12 +19,16 @@ var PageManager = new Ten.Class({
 			}
 			/* ページャの更新 */
 			self.updatePager(data.has_pre);
+			
+			/* その場編集機能用 */
+			createEditButton();
 		});
 	},
 	/* エントリの生成 */
 	createEntry : function (entry, id) {
 		var section = document.createElement('section');
 		section.className = 'entry_item';
+		section.id = id;
 		
 		section.appendChild(this.createEntryHeader(entry, id));
 		section.appendChild(this.createEntryBody(entry));
@@ -44,6 +48,7 @@ var PageManager = new Ten.Class({
 		for ( cid in entry.categories ) {
 			var category = document.createElement('a');
 			category.href = "/category?id=" + cid;
+			category.id = cid;
 			category.appendChild(document.createTextNode(entry.categories[cid].name));
 			header.appendChild(category);
 		}
@@ -70,7 +75,7 @@ var PageManager = new Ten.Class({
 		this.page--;
 		var entry_list = document.getElementById('entry_list');
 		var entries = entry_list.getElementsByTagName('section');
-
+		
 		var limit = 3;
 		/* 3(表示数)の倍数になるまでエントリを削除 */
 		for (var i = entries.length-1;; i-- ) {
