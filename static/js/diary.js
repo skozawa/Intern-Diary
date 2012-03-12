@@ -7,14 +7,27 @@ var PageManager = new Ten.Class({
 },{
 	/* エントリの追加 */
 	add : function () {
-		this.page++;
+		/* 表示数が3エントリ以上であれば、次のページのエントリを表示(その場編集機能への対応) */
+		var sections = entry_list.getElementsByTagName('section');
+		if ( sections.length > 3 ) { this.page++; }
+		
 		var self = this;
 		new Ten.XHR('/API/?page=' + this.page, {}, function (res) {
 			var entry_list = document.getElementById('entry_list');
 			var data = eval("(" + res.responseText + ")");
+			
+			/* 現在表示されているエントリのIDを取得 */
+			var sections = entry_list.getElementsByTagName('section');
+			var section_ids = {};
+			for ( var i = 0; i < sections.length ; i++ ) {
+				section_ids[sections[i].id] = 1;
+			}
+			
 			/* エントリの追加 */
 			for ( var id in data.entries ) {
 				var entry = data.entries[id];
+				/* 既に表示されていれば、追加しない */
+				if ( section_ids[id] == 1) { continue; }				
 				entry_list.appendChild(self.createEntry(entry, id));
 			}
 			/* ページャの更新 */
@@ -51,8 +64,9 @@ var PageManager = new Ten.Class({
 			category.id = cid;
 			category.appendChild(document.createTextNode(entry.categories[cid].name));
 			header.appendChild(category);
+			header.appendChild(document.createTextNode(" "));
 		}
-		header.appendChild(document.createTextNode(" ] "));
+		header.appendChild(document.createTextNode("] "));
 		
 		return header;
 	},
@@ -81,7 +95,7 @@ var PageManager = new Ten.Class({
 		for (var i = entries.length-1;; i-- ) {
 			var entry = entries[i];
 			entry_list.removeChild(entries[i]);
-			if ( i % limit == 0 ) { break; }
+			if ( i % limit == 1) { break; }
 		}
 		/* ページャの更新 */
 		this.updatePager(1);

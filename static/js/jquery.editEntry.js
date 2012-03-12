@@ -184,6 +184,7 @@
 				this.id = data.id;
 				this.created_on = data.created_on;
 				$section.attr("id", this.id);
+				$section.attr("class", "entry_item");
 				/* 「作成」ボタンを追加 */
 				createAddButton();
 			}
@@ -198,9 +199,6 @@
 			var $section = $("#entry_list").find("section#" + this.id);
 			$section.find('button').click(function () {	edit.openForm(); });
 		},
-		
-		
-//-----------------------------------------
 		
 		/* 削除するIDを送信 */
 		deleteEntry : function () {
@@ -221,7 +219,7 @@
 		},
 		/* エントリのノードを削除 */
 		successDelete : function () {
-			$("section#" + this.id).empty();
+			$("section#" + this.id).remove();
 		},
 		completeDelete : function () {
 			
