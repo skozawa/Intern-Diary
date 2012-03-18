@@ -33,7 +33,7 @@ Timer.prototype = {
         if ( self.elapsedTime > self.endTime ) {
             clearInterval(self.timerID);
             self.timerID = undefined;
-            self.callback();
+            self.callback({ realElapsed : this.elapsedTime });
             self.elapsedTime = self.endTime;
         }
         document.getElementById(self.id).innerHTML = self.elapsedTime;
@@ -60,9 +60,10 @@ Timer.prototype = {
         document.getElementById(this.id).innerHTML = "0";
     },
     /* コールバック */
-    callback : function () {
+    callback : function (args) {
         for ( var i = 0; i < this.callbacks.length; i++ ) {
-            this.callbacks[i]();
+            //this.callbacks[i]();
+            this.callbacks[i].call(this, args);
         }
     },
     /* コールバックの追加 */
@@ -118,6 +119,7 @@ timer.appendChild(clearButton);
 
 document.body.appendChild(timer);
 
+
 function test () {
     alert("callback");
 }
@@ -127,3 +129,7 @@ SampleTimer.addListener(function(){ alert("callback2"); });
 
 SampleTimer.addListener(test);
 SampleTimer.removeListener(test);
+
+SampleTimer.addListener(function(e) {
+    alert(e.realElapsed);
+});
