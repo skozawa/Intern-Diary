@@ -171,7 +171,6 @@ var PageManager = new Ten.Class({
 			arrow_down.addEventListener('click', function () { self.add(); });
 			center.appendChild(arrow_down);
 		}
-	},
-	
+	}
 });
 

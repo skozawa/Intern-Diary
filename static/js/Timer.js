@@ -77,7 +77,7 @@ Timer.prototype = {
 				break;
 			}
 		}
-	},
+	}
 };
 
 

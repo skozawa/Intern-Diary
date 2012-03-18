@@ -248,7 +248,7 @@
 			/* 一時データを破棄し、リンクを削除 */
 			this.tempData = undefined;
 			$section.find("#temp_link").empty();
-		},
+		}
 	});
 	
 	$.fn.editEntry = function () {
