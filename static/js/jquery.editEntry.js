@@ -172,7 +172,7 @@
         /* XHRに成功した場合、タイトルなどの値を更新し、フォームを閉じる */
         /* XHRが完了するまでは、「編集」ボタンにイベントを追加しない */
         successPostEntry : function (res) {
-            var data = eval("(" + res + ")");
+            var data = res;
             this.title = data.title;
             this.categories = data.categories;
             this.body = data.body;
