@@ -36,25 +36,8 @@
             var edit = this;
             var $section = $("#entry_list").find("section#" + this.id);
             /* フォームの作成 */
-            $section.html(this.createForm());
-            
-            var $buttons = $section.find('button');
-            /* 新規作成の場合 */
-            if ( this.id == "new_entry" ) {
-                /* 「閉じる」ボタンにイベントを割り当てる */
-                $($buttons[0]).click( function () {    edit.closeAddForm(); });
-                /* 「保存」ボタンにイベントを割り当てる */
-                $($buttons[1]).click( function () { edit.postEntry(); });
-            }
-            /* 編集の場合 */
-            else {
-                /* 「閉じる」ボタンにイベントを割り当てる */
-                $($buttons[0]).click( function () {    edit.closeModifyForm(); });
-                /* 「保存」ボタンにイベントを割り当てる */
-                $($buttons[1]).click( function () { edit.postEntry(); });
-                /* 「削除」ボタンにイベントを割り当てる */
-                $($buttons[2]).click( function () { edit.deleteEntry(); });
-            }
+            //$section.html(this.createForm());
+            this.createForm($section);
             
             /* フォームに変更があった場合、データを一時的に保存する */
             $section.find("input,textarea").change(function() { edit.tempStore(); });
@@ -69,26 +52,61 @@
             }
         },
         /* フォームの作成 */
-        createForm : function () {
+        createForm : function ($section) {
+            /* 要素をクリア */
+            $section.empty();
+            
             /* 連想配列からカテゴリ名を取得し、配列に保存 */
             var categoryTexts = [];
             for (var id in this.categories) {
                 categoryTexts.push(this.categories[id]);
             }
             
-            var html = ""
-            + "<p>タイトル<input type='text' name='title' id='title' value='" + this.title + "'></p>"
-            + "<p>カテゴリ(コンマ区切り)<input type='text' name='category' id='category' value='" + categoryTexts + "'></p>"
-            + "<p>本文<textarea name='body' id='body'>" + this.body + "</textarea></p>"
-            + "<p class='submit_button'>"
-            + "<button type='button'>閉じる</button>"
-            + "<button type='button'>保存</button>";
-            if ( this.id != "new_entry" ) {
-                html += "<button type='button'>削除</button>";
-            }
-            html += "</p>";
+            /* タイトルの作成 */
+            var $inputTitle = $('<input type="text">');
+            $inputTitle.attr({ name : 'title', id : "title"});
+            $inputTitle.val(this.title);
+            $section.append($('<p>タイトル</p>').append($inputTitle));
             
-            return html;
+            /* カテゴリの作成 */
+            var $inputCategory = $('<input type="text">');
+            $inputCategory.attr({ name : 'category', id : "category" });
+            $inputCategory.val(categoryTexts);
+            $section.append($('<p>カテゴリ</p>').append($inputCategory));
+            
+            /* 本文の作成 */
+            var $textareaBody = $('<textarea>');
+            $textareaBody.attr({ name : "body", id : "body"});
+            $textareaBody.val(this.body);
+            $section.append($('<p>本文</p>').append($textareaBody));
+            
+            /* ボタンの作成 */
+            var $buttons = $('<p>');
+            $buttons.attr("class", "submit_button");
+            
+            var $closeButton = $('<button type="button">閉じる</button>');
+            $buttons.append($closeButton);
+            var $saveButton = $('<button type="button">保存</button>');
+            $buttons.append($saveButton);
+            
+            /* ボタンへのイベント追加 */
+            var edit = this;
+            /* 新規作成の場合 */
+            if ( this.id == "new_entry" ) {
+                $closeButton.click( function () { edit.closeAddForm(); });
+                $saveButton.click( function () { edit.postEntry(); });
+            }
+            /* 編集の場合 */
+            else {
+                $closeButton.click( function () { edit.closeModifyForm(); });
+                $saveButton.click( function () { edit.postEntry(); });
+            }
+            if ( this.id != "new_entry" ) {
+                var $deleteButton = $('<button type="button">削除</button>');
+                $buttons.append($deleteButton);
+                $deleteButton.click( function () { edit.deleteEntry(); });
+            }
+            $section.append($buttons);
         },
         
         /* 作成用フォームを閉じる */
@@ -99,7 +117,7 @@
             $section.html("<button type='button'>作成</button>");
             
             /* 「作成」ボタンにイベントを割り当てる */
-            $section.find('button').click(function () {    edit.openForm(); });
+            $section.find('button').click(function () { edit.openForm(); });
         },
         
         /* 編集用フォームを閉じる */
@@ -107,26 +125,44 @@
             var edit = this;
             var $section = $("#entry_list").find("section#" + this.id);
             /* 表示用HTMLの作成 */
-            $section.html(this.createDisplay());
+            //$section.html(this.createDisplay());
+            this.createDisplay($section);
             
             /* 「編集」ボタンにイベントを割り当てる */
-            $section.find('button').click(function () {    edit.openForm(); });
+            $section.find('button').click(function () { edit.openForm(); });
         },
         /* 表示用のHTMLを作成 */
-        createDisplay : function () {
-            var html = ""
-            + "<header><a href='/diary?id=" + this.id + "'>" + this.title + "</a>"
-            + " [ ";
+        createDisplay : function ($section) {
+            /* 要素をクリア */
+            $section.empty();
+                        
+            var $header = $('<header>');
+            /* タイトル */
+            var $aTitle = $('<a>');
+            $aTitle.attr('href', '/diary?id=' + this.id);
+            $aTitle.text(this.title);
+            $header.append($aTitle);
+            /* カテゴリ */
+            $header.append(" [ ");
             for (var id in this.categories) {
-                html += "<a href='/category?id=" + id + "' id='" + id + "'>" + this.categories[id] +"</a> ";
+                var $aCategory = $('<a>');
+                $aCategory.attr({ href : "/category?id=" + id, id : id });
+                $aCategory.text(this.categories[id]);
+                $header.append($aCategory);
+                $header.append(" ");
             }
-            html += "] "
-            + "<button type='button'>編集</button>"
-            + "</header>"
-            + "<p>" + this.body + "</p>"
-            + "<footer>" + this.createdOn + "</footer>";
-            
-            return html;
+            $header.append("] ");
+            /* 編集ボタン */
+            $header.append($('<button type="button">編集</button>'));
+            $section.append($header);
+            /* 本文 */
+            var $pBody = $('<p>');
+            $pBody.text(this.body);
+            $section.append($pBody);
+            /* フッター */
+            var $footer = $('<footer>');
+            $footer.text(this.createdOn);
+            $section.append($footer);
         },
         
         /* エントリをPostで送信する */
@@ -188,7 +224,8 @@
                 /* 「作成」ボタンを追加 */
                 createAddButton();
             }
-            $section.html(this.createDisplay());
+            //$section.html(this.createDisplay());
+            this.createDisplay($section);
             
             /* 一時データは削除 */
             this.tempData = undefined;
@@ -197,7 +234,7 @@
         completePostEntry : function () {
             var edit = this;
             var $section = $("#entry_list").find("section#" + this.id);
-            $section.find('button').click(function () {    edit.openForm(); });
+            $section.find('button').click(function () { edit.openForm(); });
         },
         
         /* 削除するIDを送信 */
