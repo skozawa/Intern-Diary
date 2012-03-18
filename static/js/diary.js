@@ -8,7 +8,7 @@ var PageManager = new Ten.Class({
     /* エントリの追加 */
     add : function () {
         /* 表示数が3エントリ以上であれば、次のページのエントリを表示(その場編集機能への対応) */
-		var entryList = document.getElementById('entry_list');
+        var entryList = document.getElementById('entry_list');
         var sections = entryList.getElementsByTagName('section');
         if ( sections.length > 3 ) { this.page++; }
         
@@ -115,7 +115,7 @@ var PageManager = new Ten.Class({
         /* 既にリンクが存在しているか */
         if ( preLink ) {
             /* 読み込み対象のエントリが存在する場合，ページ数の更新 */
-            if ( hasPre == 1 ) {
+            if ( hasPre ) {
                 preLink.href = "/?page=" + (this.page+1);
             }
             /* 存在しない場合、リンクを削除 */
@@ -127,7 +127,7 @@ var PageManager = new Ten.Class({
         /* リンクが存在しない場合 */
         else {
             /* 読み込み対象のエントリが存在すれば、リンクを追加 */
-            if ( hasPre == 1 ) {
+            if ( hasPre ) {
                 preLink = document.createElement('a');
                 preLink.id = 'pre_link';
                 preLink.href = "/?page=" + (this.page+1);
@@ -160,11 +160,11 @@ var PageManager = new Ten.Class({
     updateDownArrow : function (center, hasPre) {
         var arrowDown = document.getElementById('arrow_down');
         /* 前のエントリがなければ、矢印を削除 */
-        if ( arrowDown && hasPre != 1) {
+        if ( arrowDown && !hasPre ) {
             center.removeChild(arrowDown);
         }
         /* 前のエントリがあれば、矢印を追加 */
-        else if ( !arrowDown && hasPre == 1) {
+        else if ( !arrowDown && !hasPre ) {
             var self = this;
             arrowDown = document.createElement('img');
             arrowDown.id = 'arrow_down';

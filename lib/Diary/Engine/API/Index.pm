@@ -18,7 +18,7 @@ sub default : Public {
         
         my $entries = $r->user->entries(page => $page);
         my $entry_size = $r->user->entry_size;
-        my $has_pre = $page * $limit < $entry_size ? 1 : 0;
+        my $has_pre = $page * $limit < $entry_size ? 'true' : 'false';
         
         ## JSON用ハッシュの生成
         my $data = {
