@@ -27,7 +27,7 @@
             this.title = $($children[0]).text();
             this.categories = category;
             this.body = $section.find('p').text();
-            this.created_on = $section.find('footer').text();
+            this.createdOn = $section.find('footer').text();
             
         },
         
@@ -71,14 +71,14 @@
         /* フォームの作成 */
         createForm : function () {
             /* 連想配列からカテゴリ名を取得し、配列に保存 */
-            var category_texts = [];
+            var categoryTexts = [];
             for (var id in this.categories) {
-                category_texts.push(this.categories[id]);
+                categoryTexts.push(this.categories[id]);
             }
             
             var html = ""
             + "<p>タイトル<input type='text' name='title' id='title' value='" + this.title + "'></p>"
-            + "<p>カテゴリ(コンマ区切り)<input type='text' name='category' id='category' value='" + category_texts + "'></p>"
+            + "<p>カテゴリ(コンマ区切り)<input type='text' name='category' id='category' value='" + categoryTexts + "'></p>"
             + "<p>本文<textarea name='body' id='body'>" + this.body + "</textarea></p>"
             + "<p class='submit_button'>"
             + "<button type='button'>閉じる</button>"
@@ -124,7 +124,7 @@
             + "<button type='button'>編集</button>"
             + "</header>"
             + "<p>" + this.body + "</p>"
-            + "<footer>" + this.created_on + "</footer>";
+            + "<footer>" + this.createdOn + "</footer>";
             
             return html;
         },
@@ -182,7 +182,7 @@
             /* 新規作成の場合 */
             if ( this.id == "new_entry" ) {
                 this.id = data.id;
-                this.created_on = data.created_on;
+                this.createdOn = data.created_on;
                 $section.attr("id", this.id);
                 $section.attr("class", "entry_item");
                 /* 「作成」ボタンを追加 */
