@@ -2,12 +2,11 @@ package Diary::Engine::API::Index;
 use strict;
 use warnings;
 use Diary::Engine -Base;
-use JSON;
+use JSON::XS;
 use Diary::MoCo;
 
 sub default : Public {
     my ($self, $r) = @_;
-    #$r->res->content('Diary');
     
     $r->req->form(
         page => ['NOT_BLANK','UINT'],
@@ -21,11 +20,30 @@ sub default : Public {
         my $entry_size = $r->user->entry_size;
         my $has_pre = $page * $limit < $entry_size ? 1 : 0;
         
-        $r->stash->param(
-            entries => $entries,
+        ## JSON用ハッシュの生成
+        my $data = {
+            entries => {},
             page => $page,
             has_pre => $has_pre,
-        );
+        };
+        foreach my $entry ( @$entries ) {
+            $data->{entries}->{$entry->id} = {
+                "title" => $entry->title,
+                #categories => {},
+                "body" => $entry->body,
+                "created_on" => $entry->created_on->datetime,
+            };
+            my $categories = {};
+            foreach my $category ( @{$entry->categories} ) {
+                $categories->{$category->id} = {
+                    name => $category->name,
+                };
+            }
+            $data->{entries}->{$entry->id}->{categories} = $categories;
+        }
+        
+        $r->res->content_type('application/json');
+        $r->res->content(encode_json $data);
     }
 }
 
@@ -62,10 +80,21 @@ sub _add_post {
             category => $category,
             entry_id => $entry->id,
         );
-
-        $r->stash->param(
-            entry => $entry,
-        );
+        
+        ## JSON用ハッシュの生成
+        my $data = {
+            id => $entry->id,
+            title => $entry->title,
+            categories => {},
+            body => $entry->body,
+            created_on => $entry->created_on->datetime,
+        };
+        foreach my $category ( @{$entry->categories} ) {
+            $data->{categories}->{$category->id} = $category->name;
+        }
+        
+        $r->res->content_type('application/json');
+        $r->res->content(encode_json $data);
     }
 }
 
@@ -82,8 +111,6 @@ sub delete : Public {
         $r->res->redirect('/');
         return;
     }
-    
-    print STDERR "+++\n";
     
     $r->follow_method;
 }
@@ -140,9 +167,20 @@ sub _edit_post {
             category => $category,
         );
         
-        $r->stash->param(
-            entry => $entry,
-        );
+        ## JSON用ハッシュの生成
+        my $data = {
+            id => $entry->id,
+            title => $entry->title,
+            categories => {},
+            body => $entry->body,
+            created_on => $entry->created_on->datetime,
+        };
+        foreach my $category ( @{$entry->categories} ) {
+            $data->{categories}->{$category->id} = $category->name;
+        }
+        
+        $r->res->content_type('application/json');
+        $r->res->content(encode_json $data);
     }
 }
 
